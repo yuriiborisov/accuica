@@ -1,0 +1,36 @@
+body{
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+#container-login{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+}
+#container-login fieldset{
+    box-shadow: 0 2px 14px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+    border-color: #FFF;
+    border-style: solid;
+}
+legend{
+    font-family: arial;
+    font-weight: 600;
+}
+
+label {
+    font-family: arial;
+    font-size: 10pt;
+}
+#input {
+    margin: 5px;
+}
+.form-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Table with Bootstrap</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="../static/js/scripts.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container-xxl">
+    <h1>Dynamic Table</h1>
+    <table class="table table-striped table-bordered" id="dynamicTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Alt</th>
+            <th>Is Calculated</th>
+            <th>Description</th>
+            <th>Is Filter</th>
+            <th>Filter Value</th>
+            <th>Priority Order</th>
+            <th>Script</th>
+            <th>Applicable</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Table rows will be inserted here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Example data for the table
+
+    // const result = async () => {
+    //
+    // }
+
+    // Function to populate the table with data
+    function populateTable(data) {
+        var tableBody = document.getElementById('dynamicTable').getElementsByTagName('tbody')[0];
+        for (var i = 0; i < data.length; i++) {
+            var row = document.createElement('tr');
+            row.innerHTML = `
+      <td>${data[i].id}</td>
+      <td>${data[i].alt}</td>
+      <td>${data[i].is_calculated}</td>
+      <td>${data[i].description}</td>
+      <td>${data[i].is_filter}</td>
+      <td>${data[i].filter_value}</td>
+      <td>${data[i].priority_order}</td>
+      <td>${data[i].script}</td>
+      <td>${data[i].applicable}</td>
+    `;
+            tableBody.appendChild(row);
+        }
+    }
+    $(document).ready(async function() {
+        var tableData = [];
+        const resp =  await getAllPrivileges();
+        resp.forEach(function (item, index) {
+            var itemData = {
+                id: item.id,
+                alt: item.alt,
+                is_calculated: item.isCalculated,
+                description: item.description,
+                is_filter: item.isFilter,
+                filter_value: item.filterValue,
+                priority_order: item.priorityOrder,
+                script: item.statementScript,
+                applicable: item.applicable
+            }
+            tableData.push(itemData);
+        });
+        populateTable(tableData);
+    });
+    // Call the function to populate the table
+
+    async function getAllPrivileges(){
+        return await fetch('http://localhost:8081/privilege/get-all', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse the response as JSON
+            })
+            .then(data => {
+                return data;
+                console.log(data); // This will log the JSON data from the response
+                // You can now use the data variable to access the JSON data
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                // Handle the error appropriately, such as displaying an error message to the user
+            });
+
+        //let r = await resp.json();
+        //console.log('r', r);
+        //return r
+
+    }
+
+</script>
+</body>
+</html>

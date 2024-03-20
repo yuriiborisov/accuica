@@ -1,0 +1,42 @@
+server:
+  port: 8081
+SQLDIALECT: org.hibernate.dialect.PostgreSQLDialect
+JDBC_URL_DB: jdbc:postgresql://localhost:5436/postgres
+DB_ADMIN: asc_admin
+DB_PASSWORD: o9p0[-]=
+
+spring:
+
+  datasource:
+    ascdb:
+      username: ${DB_ADMIN}
+      password: ${DB_PASSWORD}
+      driver-class-name: org.postgresql.Driver
+      pool-name: 'primary'
+      jdbcUrl: ${JDBC_URL_DB}
+      configuration:
+        maximum-pool-size: 30
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+      database-platform: ${SQLDIALECT}
+    properties:
+      hibernate:
+        dialect: ${SQLDIALECT}
+        show_sql: true
+        use_sql_comments: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: false
+
+  uica:
+    maximum_allowed: true
+
+
+default:
+  initialization:
+    privileges:
+      enabled: true

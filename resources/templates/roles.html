@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Matrix with Bootstrap</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom styles for the sidebar */
+        .sidebar {
+            height: 100vh;
+            width: 200px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 6px 8px 6px 16px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #333;
+            display: block;
+        }
+
+        .sidebar a:hover {
+            color: #16181b;
+        }
+
+        /* Main content styles */
+        .main-content {
+            margin-left: 200px;
+            padding: 20px;
+        }
+
+        /* Tabs styles */
+        .nav-tabs {
+            margin-bottom: 15px;
+        }
+		/* Table with horizontal scroll */
+        .table-container {
+            max-width: 100%;
+            overflow-x: auto;
+			height: 70vh;
+        }
+
+		
+		.table-fixed {
+            overflow-y: auto;
+        }
+		table thead th:first-child {
+		  position: sticky;
+		  left: 0;
+		  z-index: 2;
+		}
+		table tbody th {
+          position: sticky;
+          left: 0;
+          background: white;
+          z-index: 1;
+        }
+		
+		/* Fixed first column */
+        .table-fixed thead td:first-child,
+        .table-fixed tbody td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background-color: #fff;
+			max-width: 250px;
+            overflow: hidden;
+            line-height: 10pt;
+            font-size: 9pt;
+        }	
+		
+		.table-fixed thead tr:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 20;
+            background-color: #fff;
+            font-size: 9pt
+        }
+		
+		.table-fixed thead tr td:first-child{
+		  background-color: #959595;
+			color:#fff;
+            font-size: 9pt
+		}
+		
+		.table-fixed thead tr {
+            position: sticky;
+			top: 0;
+			background-color: #fff;
+			z-index: 20;
+            font-size: 9pt
+
+        }
+        input[type="checkbox"]:hover {
+            cursor: pointer;
+        }
+
+        input[type="checkbox"], input[type="radio"] {
+            box-sizing: border-box;
+            padding: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <a href="#privileges">Privileges</a>
+    <a href="#roles">Roles</a>
+    <a href="#access">Access</a>
+</div>
+
+<!-- Main content -->
+<div class="main-content">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="tab1-tab" data-toggle="tab" href="#tab1" role="tab" aria-controls="tab1" aria-selected="true">Tab1</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2" aria-selected="false">Tab2</a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+            <div class="container-xxl">
+                <h2>Role Matrix: </h2>
+				<div class="table-container">
+                <table class="table table-fixed data-show-columns table-striped" id="roleMatrixTable">
+                    <thead id="roleMatrixTableHeader">
+                        <!-- <tr>
+                            <th>#</th>
+                            <th>Role</th>
+                            <th>Privileges</th>
+                            <th>Actions</th>
+                        </tr> -->
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be generated here -->
+                    </tbody>
+                </table>
+				</div>
+            </div>
+            <button class="btn btn-primary save-btn">Save</button>
+        </div>
+        <div class="tab-pane fade" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+            <!-- Content for Tab2 goes here -->
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="extensions/sticky-header/bootstrap-table-sticky-header.css">
+<script src="extensions/sticky-header/bootstrap-table-sticky-header.js"></script>
+<script th:inline="javascript">
+    // Your JSON data
+    var roleData = [
+        {"entity":"entity1", "privileges":["priv1","priv2"]},
+        {"entity":"entity2", "privileges":["priv11","priv12"]},
+        {"entity":"entity3", "privileges":["priv31","priv32"]}
+    ];
+	//var privilegesData = ["priv1","priv2","priv11","priv12","priv31","priv32", "priv4","priv42","priv41","priv52","priv51","priv52","priv1","priv2","priv11","priv12","priv31","priv32", "priv4","priv42","priv41","priv52","priv51","priv52"];
+	// Your login credentials
+	var login = 'spring';
+	var password = 'secret';
+
+	// Combine the login and password with a colon and then encode it in base64
+	var credentials = login + ':' + password;
+	var base64Credentials = btoa(credentials);
+
+	// Create the authorization header
+	var authorizationHeader = 'Basic ' + base64Credentials;
+	
+	async function getEntities(id){
+		return await fetch('http://localhost:8081/role/entities/'+id, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': authorizationHeader
+		},
+		})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json(); // Parse the response as JSON
+		})
+		.then(data => {
+			return data;
+			console.log(data); // This will log the JSON data from the response
+			// You can now use the data variable to access the JSON data
+		})
+		.catch(error => {
+			console.error('There was a problem with the fetch operation:', error);
+			// Handle the error appropriately, such as displaying an error message to the user
+		});
+
+			//let r = await resp.json();
+			//console.log('r', r);
+		//return r
+		
+	}
+    function handleCheckbox(id){
+
+    }
+    async function handleSave(data){
+        return await fetch('http://localhost:8081/role', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authorizationHeader
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse the response as JSON
+            })
+            .then(data => {
+                return data;
+                console.log(data); // This will log the JSON data from the response
+                // You can now use the data variable to access the JSON data
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                // Handle the error appropriately, such as displaying an error message to the user
+            });
+
+        //let r = await resp.json();
+        //console.log('r', r);
+        //return r
+
+    }
+	
+	async function getMatrixT(id){
+		return await fetch('http://localhost:8081/role/matrix-t/' + id, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': authorizationHeader
+		},
+		})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json(); // Parse the response as JSON
+		})
+		.then(data => {
+			return data;
+			console.log(data); // This will log the JSON data from the response
+			// You can now use the data variable to access the JSON data
+		})
+		.catch(error => {
+			console.error('There was a problem with the fetch operation:', error);
+			// Handle the error appropriately, such as displaying an error message to the user
+		});
+
+			//let r = await resp.json();
+			//console.log('r', r);
+		//return r
+		
+	}
+ 
+
+	function generateTableHeader(data) {
+	var tableHeader = $('#roleMatrixTable thead');
+	tableHeader.empty();
+		
+		var row = $('<tr>');
+		row.append($('<td>' + 'Privilege' + '</td>'));
+		data.forEach(function(item, index) {
+            var headerCell = $('<td><p><strong>' + item + '</p></td>');
+			 //var headerCell = $('<td class="td-sm"><p><strong>' + item.id + '</strong></p><p><small>' + item.description + '</small></p></td>');
+            row.append(headerCell);
+
+            // Append row to the table body
+            tableHeader.append(row);
+        });
+	}
+	
+	function getPrivilegesIds(data){
+	var result = [];
+		data.forEach((item, index) => {
+			result.push(item.id);
+		})
+		return result;
+	}
+	
+    // Function to generate the table rows
+    function generateTableRows(matrixT, entitiesData) {
+        var tableBody = $('#roleMatrixTable tbody');
+		
+        tableBody.empty(); // Clear existing rows
+		
+        matrixT.forEach(function(item, index) {
+		//console.log('item', item);
+            var row = $('<tr>');
+            //var checkboxCell = $('<td><input type="checkbox"></td>');
+            var roleCell = $('<td><p class="privilege_id"><strong>' + item.privilege.id + '</strong></p><p><small>' + item.privilege.description + '</small></p></td>');
+			//$('<td><p><strong>' + item.id + '</strong></p><p><small>' + item.description + '</small></p></td>')
+            //var privilegesCell = $('<td>' + item.privileges.join(', ') + '</td>');
+            //var actionsCell = $('<td><button class="btn btn-primary save-btn">Save</button> <button class="btn btn-danger delete-btn">Delete</button></td>');
+
+            // Append cells to the row
+            //row.append(checkboxCell);
+            row.append(roleCell);
+			
+			entitiesData.forEach((entityItem, index) => {
+			//console.log('item.privilege.applicable', item.privilege.applicable);
+				 var checkboxCell = $('<td><input type="checkbox" ' + (item.entities.includes(entityItem) ? "class='checked' checked" : '') + ( item.privilege.applicable == null || item.privilege.applicable.entities.includes(entityItem) ? '' : 'disabled ')+'></td>');
+				 row.append(checkboxCell);
+			});
+			//item.privileges.forEach((item, index) => {
+			//var privilegesCell = $('<td>' + item + '</td>');
+			// row.append(privilegesCell);
+			//});
+            //row.append(privilegesCell);
+           // row.append(actionsCell);
+
+            // Append row to the table body
+            tableBody.append(row);
+        });
+    }
+    const ROLE = [[${roleId}]];
+    // Generate table rows on page load
+    $(document).ready(async function() {
+
+	const entitiesData = await getEntities(ROLE);
+	const matrixT = await getMatrixT(ROLE);
+    console.log('matrixT', matrixT);
+	console.log('entitiesData', entitiesData);
+		generateTableHeader(entitiesData);
+        generateTableRows(matrixT, entitiesData);
+
+        // Add event listeners for save and delete buttons
+        $("tbody input[type='checkbox']").click(function() {
+            // $(this).checked
+            // this.prop("checked", !this.checked);
+            if(!this.checked){
+                this.classList.remove("checked");
+            }else{
+                this.classList.add("checked");
+            }
+            console.log(getCheckboxesValues());
+            // this.addClass("checked", !this.checked);
+            // alert('Checkbox clicked '+ this.prop('checked', true););
+        })
+
+        $('.save-btn').on('click', function() {
+            // Handle save button click
+            handleSave(getCheckboxesValues());
+            alert('Save button clicked');
+        });
+
+        $('.delete-btn').on('click', function() {
+            // Handle delete button click
+            alert('Delete button clicked');
+        });
+    });
+
+    function extractEntityIndexes(){
+        var entities = document.getElementById('roleMatrixTableHeader').getElementsByTagName('tr')[0].getElementsByTagName('td');
+        var entityMap = new Map();
+        for (var i = 0; i < entities.length; i++) {
+            var item = entities[i].textContent;
+
+            entityMap.set(i, item);
+        };
+        return entityMap;
+    }
+    function getCheckboxesValues() {
+        let tableBody = document.getElementById('roleMatrixTable').getElementsByTagName('tbody')[0];
+        let rows = tableBody.getElementsByTagName('tr');
+
+        // Array to hold the extracted values
+        var privilegeMap = new Map();
+        var entityPrivilegeListMap = new Map();
+        var entitiesMap = extractEntityIndexes();
+        var grantAccesses = [];
+        // Loop through each row
+        for (let i = 0; i < rows.length; i++) {
+            // Get the cells in the current row
+            let cells = rows[i].getElementsByTagName('td');
+
+            var privilegeIds = [];
+            // Extract the values from the cells
+            privilegeMap.set(i, cells[0].getElementsByClassName('privilege_id')[0].textContent);
+            for(let j = 0; j < cells.length; j++){
+                if(j > 0){
+                    var inp = cells[j].getElementsByTagName('input')[0];
+                    if(inp.type === 'checkbox'){
+                        // if(inp !== undefined && inp.checked){
+                        if(inp.classList.contains("checked")){
+                            // console.log('privilegeMap', privilegeMap);
+                            // console.log('privilegeMap', privilegeMap);
+                            privilegeIds = entityPrivilegeListMap.get(j) == undefined ? [] : entityPrivilegeListMap.get(j);
+                            privilegeIds.push(privilegeMap.get(i));
+                            entityPrivilegeListMap.set(j, privilegeIds);
+                        }
+                    }
+                }
+            }
+
+
+
+
+            // Add the row values to the array
+        }
+        console.log('entityPrivilegeListMap', entityPrivilegeListMap);
+
+        // console.log('privilegeMap',privilegeMap);
+        for(let i = 0; i < entitiesMap.size; i++){
+            if(i > 0){
+                grantAccesses.push({
+                    entityType: entitiesMap.get(i),
+                    privilegeIds: entityPrivilegeListMap.get(i) == undefined ? [] : entityPrivilegeListMap.get(i)
+                })
+            }
+        }
+        let result = {
+            id: ROLE,
+            grantAccesses: grantAccesses
+        };      // Return the extracted values
+        return result;
+    }
+
+</script>
+</body>
+</html>
