@@ -14,7 +14,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @SpringBootApplication
 //		(exclude = SecurityAutoConfiguration.class)
 //@EnableCaching
-public class tApplication {
+public class Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
