@@ -22,7 +22,7 @@
           <tr v-for="(item, index) in roles" :key="item.id" v-on:click="handleEditRole2($event, item)">
             <td class="id-cell">{{item.id}}</td>
             <td>{{item.name}}</td>
-            <td class="priority-cell">{{item.priority}}</td>
+            <td class="priority-cell">{{item.sortOrder}}</td>
             <td class="description-cell">{{item.description}}</td>
             <td>{{item.parent?.id}}</td>
             <td class="action-cell">

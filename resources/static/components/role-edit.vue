@@ -16,7 +16,7 @@
       </div>
       <div class="form-group">
         <label for="priority">Priority</label>
-        <input type="text" class="form-control form-control-sm" id="priority" name="priority" :value="item_?.priority" required @input="inputListen">
+        <input type="text" class="form-control form-control-sm" id="sortOrder" name="sortOrder" :value="item_?.sortOrder" required @input="inputListen">
       </div>
       <div class="form-group">
         <label for="description">Description</label>

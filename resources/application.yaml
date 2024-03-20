@@ -36,7 +36,6 @@ spring:
     maximum_allowed: true
 
 
-default:
-  initialization:
-    privileges:
-      enabled: true
+accuica:
+  embedded:
+    enabled: false
