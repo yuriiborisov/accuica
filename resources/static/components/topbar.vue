@@ -17,6 +17,17 @@
           <a class="nav-link" href="#">Roles</a>
           </router-link>
         </li>
+        <li class="nav-item">
+          <router-link to="/uica">
+            <a class="nav-link" href="#">UICA</a>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/methods">
+            <a class="nav-link" href="#">Methods</a>
+          </router-link>
+        </li>
+
       </ul>
     </div>
   </nav>

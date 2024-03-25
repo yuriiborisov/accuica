@@ -1,12 +1,11 @@
 package code.accessor.core.controller;
 
+import code.accessor.core.code.AccessorServiceConfiguration;
 import code.accessor.core.code.dto.response.Role4AccessResponse;
-import code.accessor.core.code.service.RoleService4Access;
 import code.accessor.core.code.exception.BaseException;
-import code.accessor.core.code.dto.request.Role4AccessRequest;
 import code.accessor.core.code.dto.PrivilegeEntityMatrix;
-import code.accessor.impl.dto.request.Role4AccessRequestV2;
-import code.accessor.impl.service.RoleServiceImpl;
+import code.impl.accessor.dto.request.Role4AccessRequest;
+import code.impl.accessor.dto.request.Role4AccessRequestV2;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -24,10 +23,9 @@ import static code.accessor.core.config.Consts.APP;
 @Tag(name = "Role", description = "Role management APIs")
 public class RoleController {
 
-	private final RoleService4Access roleService;
-
-	public RoleController(final RoleServiceImpl roleService) {
-		this.roleService = roleService;
+	private final AccessorServiceConfiguration configuration;
+	public RoleController(final AccessorServiceConfiguration configuration) {
+		this.configuration = configuration;
 	}
 
 	@Operation(
@@ -37,7 +35,7 @@ public class RoleController {
 	)
 	@PostMapping
 	ResponseEntity<?> create(@RequestBody Role4AccessRequest role) throws BaseException {
-		Role4AccessResponse result = roleService.create(role);
+		Role4AccessResponse result = configuration.getRoleService4Access().create(role);
 		return ResponseEntity.ok().body(result);
 	}
 //
@@ -48,7 +46,7 @@ public class RoleController {
 //	)
 //	@PutMapping
 //	ResponseEntity<?> update(@RequestBody RoleRequest role) throws BaseException{
-//		RoleResponse result = roleService.update(role);
+//		RoleResponse result = configuration.getRoleService4Access().update(role);
 //		return ResponseEntity.ok().body(result);
 //	}
 //
@@ -59,7 +57,7 @@ public class RoleController {
 	)
 	@GetMapping("/get-all")
 	ResponseEntity<?> getAll(){
-		List<Role4AccessResponse> result = roleService.getAll();
+		List<Role4AccessResponse> result = configuration.getRoleService4Access().getAll();
 		return  ResponseEntity.ok().body(result);
 	}
 
@@ -70,7 +68,7 @@ public class RoleController {
 	)
 	@GetMapping("/{id}")
 	ResponseEntity<?> get(@PathVariable String id) throws BaseException {
-		Role4AccessResponse result = roleService.getById(id);
+		Role4AccessResponse result = configuration.getRoleService4Access().getById(id);
 		return ResponseEntity.ok().body(result);
 	}
 
@@ -84,8 +82,8 @@ public class RoleController {
 		if(requestV2 == null){
 			ResponseEntity.status(HttpStatus.CONFLICT);
 		}
-		roleService.update(requestV2);
-		List<PrivilegeEntityMatrix> result = roleService.getMatrix(requestV2.getId());
+		configuration.getRoleService4Access().update(requestV2);
+		List<PrivilegeEntityMatrix> result = configuration.getRoleService4Access().getMatrix(requestV2.getId());
 		return ResponseEntity.ok().body(result);
 	}
 
@@ -99,7 +97,7 @@ public class RoleController {
 		if(request == null){
 			ResponseEntity.status(HttpStatus.CONFLICT);
 		}
-		Role4AccessResponse result = roleService.update(request);
+		Role4AccessResponse result = configuration.getRoleService4Access().update(request);
 		return ResponseEntity.ok().body(result);
 	}
 
@@ -110,7 +108,18 @@ public class RoleController {
 	)
 	@GetMapping("/matrix-t/{id}")
 	ResponseEntity<?> getMatrixT(@PathVariable String id) throws BaseException {
-		List<PrivilegeEntityMatrix> result = roleService.getMatrix(id);
+		List<PrivilegeEntityMatrix> result = configuration.getRoleService4Access().getMatrix(id);
+		return ResponseEntity.ok().body(result);
+	}
+
+	@Operation(
+			summary = "Get Role Matrix.",
+			description = "Get role by id. ",
+			tags = {"ROLE"}
+	)
+	@GetMapping("/matrix-p/{id}")
+	ResponseEntity<?> getMatrixParents(@PathVariable String id) throws BaseException {
+		List<PrivilegeEntityMatrix> result = configuration.getRoleService4Access().getMatrixOfParents(id);
 		return ResponseEntity.ok().body(result);
 	}
 
@@ -160,7 +169,7 @@ public class RoleController {
 	@DeleteMapping("/{id}")
 	ResponseEntity delete(@PathVariable String id) throws BaseException{
 		try {
-			roleService.delete(id);
+			configuration.getRoleService4Access().delete(id);
 			return ResponseEntity.ok().build();
 		}catch (Exception ex){
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex);

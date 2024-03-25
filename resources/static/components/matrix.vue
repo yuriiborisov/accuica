@@ -10,12 +10,6 @@
             <td>Privilege</td>
             <td v-for ="(header, index) in headers"><p><strong>{{ header }}</strong></p></td>
           </tr>
-          <!-- <tr>
-              <th>#</th>
-              <th>Role</th>
-              <th>Privileges</th>
-              <th>Actions</th>
-          </tr> -->
           </thead>
           <tbody>
           <tr v-for ="(row, index) in rows">
@@ -26,11 +20,16 @@
               <p><small>{{ row.privilege.description }}</small>
               </p>
             </td>
-            <td v-for ="(item, index) in headers">
-              <input type="checkbox" :class="row.entities.includes(item) ? 'checked' : ''"  :checked="row.entities.includes(item)" :disabled="!( row.privilege.applicable == null || row.privilege.applicable.entities.includes(item))" v-on:click="handleCheckboxClick($event)">
+            <td v-for ="(item, index) in headers"  :class="isExtended(row.privilege.id, item) ? 'extended' : ''">
+              <input type="checkbox"
+                     :class="isChecked(row.privilege.id, row.entities, item) ? 'checked' : ''"
+                     :checked="isChecked(row.privilege.id,row.entities, item)"
+                     :disabled="isDisabled(row.privilege.id,row.privilege.applicable, item)"
+
+                     v-on:click="handleCheckboxClick($event)">
+              <p class="extended" v-if="isExtended(row.privilege.id, item)">extended</p>
             </td>
           </tr>
-          <!-- Rows will be generated here -->
           </tbody>
         </table>
       </div>
@@ -44,17 +43,39 @@ module.exports = {
   data(){
     return{
       headers: [],
-      rows: []
+      rows: [],
+      parentMatrix: new Map()
     }
   },
   computed: {
     roleId() {
       return this.$route.query.roleId;
     },
+
   },
   methods:{
+    isExtended(privilegeId, item){
+      return this.parentMatrix.get(privilegeId)?.includes(item);
+    },
+    isDisabled(privilegeId, applicable, item){
+      if(this.isExtended(privilegeId, item)){
+        return true;
+      }
+      return !( applicable == null || applicable.entities.includes(item));
+    },
+    isChecked(privilegeId, entities, item){
+      // console.log("isChecked:privilegeId", privilegeId);
+      // console.log("isChecked:entities", this.parentMatrix.get(privilegeId));
+      if(this.isExtended(privilegeId, item)){
+        return true;
+      }
+      return entities.includes(item)
+    },
     sendMessage(){
       this.$root.$emit("msg-from-matrix", JSON.stringify(this.getCheckboxesValues()));
+    },
+    checkParentPrivilege(privilegeId, entity){
+
     },
     extractEntityIndexes(){
       var entities = document.getElementById('roleMatrixTableHeader').getElementsByTagName('tr')[0].getElementsByTagName('td');
@@ -88,7 +109,7 @@ module.exports = {
             var inp = cells[j].getElementsByTagName('input')[0];
             if(inp.type === 'checkbox'){
               // if(inp !== undefined && inp.checked){
-              if(inp.classList.contains("checked")){
+              if(inp.classList.contains("checked") && !inp.classList.contains("extended")){
                 // console.log('privilegeMap', privilegeMap);
                 // console.log('privilegeMap', privilegeMap);
                 privilegeIds = entityPrivilegeListMap.get(j) == undefined ? [] : entityPrivilegeListMap.get(j);
@@ -121,21 +142,7 @@ module.exports = {
       };      // Return the extracted values
       return result;
     },
-    // loadJson() {
-    //   var jsonString = JSON.stringify(this.getCheckboxesValues()); // Replace with your JSON data
-    //   var jsonData = JSON.parse(jsonString);
-    //   var formattedJson = JSON.stringify(jsonData, null, 2); // Indentation level set to 2 for pretty printing
-    //   document.getElementById('jsonViewer').textContent = formattedJson;
-    //   hljs.highlightElement(document.getElementById('jsonViewer'));
-    // },
-    // copyToClipboard() {
-    //   var textToCopy = document.getElementById('jsonViewer').textContent;
-    //   navigator.clipboard.writeText(textToCopy).then(function() {
-    //     alert('Copied to clipboard!');
-    //   }, function(err) {
-    //     console.error('Could not copy text: ', err);
-    //   });
-    // },
+
     async getEntities(id){
       return await fetcher.fetch('/role/entities/'+id, 'GET',{
           'Content-Type': 'application/json',
@@ -153,11 +160,17 @@ module.exports = {
           // 'Authorization': authorizationHeader
         }, JSON.stringify(data));
     },
-   async getMatrixT(id){
+   async getMatrix(id){
       return await fetcher.fetch('/role/matrix-t/' + id, 'GET',{
           'Content-Type': 'application/json',
           // 'Authorization': authorizationHeader
         });
+    },
+    async getMatrixOfParents(id){
+      return await fetcher.fetch('/role/matrix-p/' + id, 'GET',{
+        'Content-Type': 'application/json',
+        // 'Authorization': authorizationHeader
+      });
     },
     async handleSaveButton(){
       this.rows = await this.handleSave(this.getCheckboxesValues());
@@ -171,56 +184,22 @@ module.exports = {
       this.sendMessage();
     }
   },
-  // updated: function () {
-  //   this.$nextTick(function () {
-  //     console.log("UPDATED");
-  //   })
-  // },
-  // async mounted(){
-  //
-  //   this.rows = await this.getMatrixT(this.roleId);
-  // },
   updated(){
     this.sendMessage();
   },
   async created() {
 
     this.headers = await this.getEntities(this.roleId);
-    this.rows = await this.getMatrixT(this.roleId);
-    // this.sendMessage();
-    // this.headers = entitiesData;
-    // this.rows = matrixT;
-    // console.log('matrixT', matrixT);
-    // console.log('entitiesData', entitiesData);
-    // this.generateTableHeader(entitiesData);
-    // this.generateTableRows(matrixT, entitiesData);
-    //
-    // // Add event listeners for save and delete buttons
-    // $("tbody input[type='checkbox']").click(function() {
-    //   // $(this).checked
-    //   // this.prop("checked", !this.checked);
-    //   if(!this.checked){
-    //     this.classList.remove("checked");
-    //   }else{
-    //     this.classList.add("checked");
-    //   }
-    //   console.log(this.getCheckboxesValues());
-    //   // this.addClass("checked", !this.checked);
-    //   // alert('Checkbox clicked '+ this.prop('checked', true););
-    // })
-    //
-    // $('.save-btn').on('click', function() {
-    //   // Handle save button click
-    //   this.handleSave(this.getCheckboxesValues());
-    //   alert('Save button clicked');
-    // });
-    //
-    // $('.delete-btn').on('click', function() {
-    //   // Handle delete button click
-    //   alert('Delete button clicked');
-    // });
-    // loadJson();
-    // hljs.highlightAll();
+    this.rows = await this.getMatrix(this.roleId);
+    const current = await fetcher.fetch('/role/' + this.roleId, 'GET', {
+      'Content-Type': 'application/json',
+      // 'Authorization': authorizationHeader
+    });
+    const parentId = current.parent?.id;
+    if(parentId != undefined){
+      const parents = await this.getMatrixOfParents(this.roleId);
+      this.parentMatrix = new Map(parents.map(i => [i.privilege.id, i.entities]));
+    }
   }
 };
 </script>
@@ -298,5 +277,9 @@ input[type="checkbox"], input[type="radio"] {
 #jsonViewer {
   height: 60vh; /* Fixed height of 400 pixels */
   overflow-y: auto; /* Enable vertical scrolling if content exceeds the height */
+}
+.extended {
+  font-size: 6pt;
+  color: #898989;
 }
 </style>

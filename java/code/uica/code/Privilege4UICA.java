@@ -1,10 +1,14 @@
 package code.uica.code;
 
 
-public interface Privilege4UICA {
-	String getId();
-	Boolean isCalculated();
-	String getStatementScript();
+import code.common.PrivilegeApplicable;
+import lombok.Data;
 
-	boolean isUica();
+@Data
+public class Privilege4UICA {
+	private String id;
+	private boolean calculated;
+	private String statementScript;
+	private boolean uica;
+	private PrivilegeApplicable applicable;
 }

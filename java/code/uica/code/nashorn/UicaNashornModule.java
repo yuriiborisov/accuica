@@ -10,8 +10,6 @@ import java.util.Map;
 
 
 @Slf4j
-@Component
-@Scope("prototype")
 public class UicaNashornModule implements code.uica.code.JsEvaluator4UICA {
 	private final JsEvaluator4UICA evaluator = new JsEvaluator4UICA();
 

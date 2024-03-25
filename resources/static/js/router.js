@@ -34,11 +34,27 @@ const routes = [
             ]
         }
     },
-    { path: '/methods', component: httpVueLoader('/components/app/matrix-page.vue'),
+    { path: '/methods', component: httpVueLoader('/components/methods.vue'),
         meta: {
             breadcrumb: [
                 {name: 'Home', link: '/'},
                 {name: 'Methods'}
+            ]
+        }
+    },
+    { path: '/uica', component: httpVueLoader('/components/uica.vue'),
+        meta: {
+            breadcrumb: [
+                {name: 'Home', link: '/'},
+                {name: 'UICA'}
+            ]
+        }
+    },
+    { path: '/uicaeditor', component: httpVueLoader('/components/uica-editor.vue'),
+        meta: {
+            breadcrumb: [
+                {name: 'Home', link: '/'},
+                {name: 'UICAEditor'}
             ]
         }
     },

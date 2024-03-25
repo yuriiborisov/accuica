@@ -3,6 +3,8 @@ package code.accessor.core.code.service;
 import code.accessor.core.code.Privilege4Access;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface PrivilegeService4Access {
 //    Privilege4Access map(Object privilege);

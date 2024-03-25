@@ -29,7 +29,7 @@
 <!--              <router-link :to="{ path: '/edit-role', query: { roleId: item.id }}">-->
 <!--                <button class="btn btn-outline-primary btn-sm">Edit</button>-->
 <!--              </router-link>-->
-              <router-link :to="{ path: '/matrix', query: { roleId: item.id }}">
+              <router-link :to="{ path: '/matrix', query: { roleId: item.id }} ">
                 <button class="btn btn btn-secondary btn-sm">Matrix</button>
               </router-link>
             </td>

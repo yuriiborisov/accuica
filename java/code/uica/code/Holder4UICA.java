@@ -1,15 +1,15 @@
 package code.uica.code;
 
-public interface Holder4UICA {
-	 String getFormId();
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
-	String getDescription();
+@Data
+public class Holder4UICA {
+	private String formId;
 
-	Config4UICA getConfig();
+	@Schema(description = "Description")
+	private String description;
 
-	void setFormId(String formId);
-
-	void setDescription(String description);
-
-	void setConfig(Config4UICA config);
+	@Schema(description = "UICAConfig")
+	private Config4UICA config;
 }

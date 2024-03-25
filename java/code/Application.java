@@ -12,7 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @SpringBootApplication
-//		(exclude = SecurityAutoConfiguration.class)
+
+//		(exclude = Sec
+//		urityAutoConfiguration.class)
 //@EnableCaching
 public class Application {
 

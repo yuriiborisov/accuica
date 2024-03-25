@@ -1,9 +1,9 @@
 package code.accessor.core.code.service;
 
 import code.accessor.core.code.dto.PrivilegeEntityMatrix;
-import code.accessor.core.code.dto.request.Role4AccessRequest;
 import code.accessor.core.code.dto.response.Role4AccessResponse;
-import code.accessor.impl.dto.request.Role4AccessRequestV2;
+import code.impl.accessor.dto.request.Role4AccessRequest;
+import code.impl.accessor.dto.request.Role4AccessRequestV2;
 
 import java.util.List;
 
@@ -17,4 +17,7 @@ public interface RoleService4Access {
     List<Role4AccessResponse> getAll();
 
     List<PrivilegeEntityMatrix> getMatrix(String id);
+
+    List<PrivilegeEntityMatrix> getMatrixOfParents(String id);
+
 }

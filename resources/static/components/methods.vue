@@ -11,28 +11,26 @@
           <thead>
           <tr>
             <th>ID</th>
-            <th>Name</th>
-            <th>Priority</th>
+            <th>Entity</th>
             <th>Description</th>
-            <th>Parent ID</th>
-            <th>Action</th>
+            <th>Privileges</th>
+<!--            <th>Action</th>-->
           </tr>
           </thead>
           <tbody>
-          <tr v-for="(item, index) in roles" :key="item.id" v-on:click="handleEditRole2($event, item)">
-            <td class="id-cell">{{item.id}}</td>
-            <td>{{item.name}}</td>
-            <td class="priority-cell">{{item.priority}}</td>
+          <tr v-for="(item, index) in roles" :key="item.key" v-on:click="handleEditRole2($event, item)">
+            <td class="id-cell">{{item.key}}</td>
+            <td class="priority-cell">{{item.entityType}}</td>
             <td class="description-cell">{{item.description}}</td>
-            <td>{{item.parent?.id}}</td>
-            <td class="action-cell">
+            <td>{{item.privileges}}</td>
+<!--            <td class="action-cell">-->
 <!--              <router-link :to="{ path: '/edit-role', query: { roleId: item.id }}">-->
 <!--                <button class="btn btn-outline-primary btn-sm">Edit</button>-->
 <!--              </router-link>-->
-              <router-link :to="{ path: '/matrix', query: { roleId: item.id }}">
-                <button class="btn btn btn-secondary btn-sm">Matrix</button>
-              </router-link>
-            </td>
+<!--              <router-link :to="{ path: '/matrix', query: { roleId: item.id }}">-->
+<!--                <button class="btn btn btn-secondary btn-sm">Matrix</button>-->
+<!--              </router-link>-->
+<!--            </td>-->
           </tr>
           <!-- Table rows will be inserted here dynamically -->
           </tbody>
@@ -104,9 +102,9 @@ module.exports = {
       })
     },
     async getAllRoles(){
-      return await fetcher.fetch('/role/get-all', 'GET',{
+      `return await fetcher.fetch('/method/get-all', 'GET',{
           'Content-Type': 'application/json',
-        });
+        });`
     }
   },
   components: {

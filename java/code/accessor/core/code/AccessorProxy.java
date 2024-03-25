@@ -1,6 +1,5 @@
 package code.accessor.core.code;
 
-import code.accessor.core.code.*;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,23 +15,23 @@ import java.util.stream.Collectors;
 public class AccessorProxy {
 
 	private final AccessorServiceConfiguration configuration;
-	private final AccessorCalculator calculator;
 	private final PrivilegesByKeyGetter privilegesByKeyGetter;
 
-	public AccessorProxy(AccessorServiceConfiguration configuration, PrivilegesByKeyGetter privilegesByKeyGetter) {
+	private final AccessorCalculator calculator;
+
+	public AccessorProxy(AccessorServiceConfiguration configuration, PrivilegesByKeyGetter privilegesByKeyGetter, AccessorCalculator calculator) {
 		this.configuration = configuration;
-		this.calculator = new AccessorCalculator(configuration);
 		this.privilegesByKeyGetter = privilegesByKeyGetter;
+		this.calculator = calculator;
 	}
 
 	@Around("execution(* *(..)) && @annotation(annotation)")
 	public Object proceed(ProceedingJoinPoint call, MethodAccess annotation) throws Throwable {
 		Object[] args = call.getArgs();
 		String entity = annotation.entity();
-		List<Privilege4Access> methodPrivileges = privilegesByKeyGetter.getPrivileges(annotation.key());
-		AccessorCalculator accessorCalculator = new AccessorCalculator(configuration);
+		List<Privilege4Access> methodPrivileges = configuration.getMethodAccessService4Access().getPrivileges(annotation.key());
 		if(annotation.filter()) {
-			Map<String, Set<Privilege4Access>> userPrivileges = accessorCalculator.getUserPrivileges();
+			Map<String, Set<Privilege4Access>> userPrivileges = calculator.getUserPrivileges();
 			List<Privilege4Access> common = methodPrivileges.stream().filter(userPrivileges.get(annotation.entity())::contains).collect(Collectors.toList());
 			return filter(call,args, common);
 		}

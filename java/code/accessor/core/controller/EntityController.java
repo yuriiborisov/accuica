@@ -1,8 +1,8 @@
 package code.accessor.core.controller;
 
+import code.accessor.core.code.AccessorServiceConfiguration;
 import code.accessor.core.code.Privilege4Access;
 import code.accessor.core.code.exception.BaseException;
-import code.accessor.impl.service.PrivilegeServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +20,9 @@ import static code.accessor.core.config.Consts.APP;
 @Tag(name = "Entity", description = "Role management APIs")
 public class EntityController {
 
-	private final PrivilegeServiceImpl privilegeServiceImpl;
-
-	public EntityController(final PrivilegeServiceImpl privilegeServiceImpl) {
-		this.privilegeServiceImpl = privilegeServiceImpl;
+	private final AccessorServiceConfiguration configuration;
+	public EntityController(final AccessorServiceConfiguration configuration) {
+		this.configuration = configuration;
 	}
 
 	@Operation(
@@ -33,7 +32,7 @@ public class EntityController {
 	)
 	@GetMapping("/get-all")
 	ResponseEntity<?> getAll() throws BaseException {
-		List<Privilege4Access> result = privilegeServiceImpl.getAll();
+		List<Privilege4Access> result = configuration.getPrivilegeService4Access().getAll();
 		return ResponseEntity.ok().body(result);
 	}
 }

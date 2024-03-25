@@ -6,6 +6,8 @@ import code.uica.impl.dto.UICAItemResponse;
 import code.uica.code.exception.UICAException;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,7 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
 //UICA - Uni-graphic Interface Component Access
 public class UICAService {
 
@@ -21,6 +22,7 @@ public class UICAService {
 //	private final UICAMapper mapper;
 //	private final UserService4UICA userService;
 	private final UICAServiceConfiguration configuration;
+	private final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	public UICAService(final UICAServiceConfiguration configuration) {
 		this.configuration = configuration;
 	}
@@ -100,7 +102,7 @@ public class UICAService {
 		// Пустой список доступов к компонентам
 		List<UICAItemResponse> componentsAccessResponse = new ArrayList<>();
 		// У каждой сущности есть набор привилегий, получаем их список по типу сущности через роли текущего пользователя
-		final Set<Privilege4UICA> userPrivileges = getUserPrivileges(config.getEntityType());
+		final Set<Privilege4UICA> userPrivileges = getUserPrivileges(config.getEntity());
 		// Определяем через роли пользователя есть ли у него привилегия делать все
 		boolean userAdminOrGod = isUserGod(userPrivileges);
 
@@ -109,7 +111,7 @@ public class UICAService {
 				Collections.emptyMap() :
 				config.getComponentAccess().stream().collect(Collectors.toMap(k -> k.getComponentId(), v -> v));
 		// Получаем корневую сущность которая будет в ответе
-		final Object entity = getEntity(params, config.getEntityType());
+		final Object entity = getEntity(params, config.getEntity());
 
 		// Эта ветка редко используется
 		if (request.getComponentIds() != null) {
@@ -162,9 +164,10 @@ public class UICAService {
 	}
 
 	private boolean isUserGod(final Set<Privilege4UICA> userPrivileges) {
-		Privilege4UICA GOD = configuration.getPrivilegeService4UICA().getGodPrivilege4UICA();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Privilege4UICA GOD = configuration.getPrivilegeService4UICA().getGodPrivilege();
 		boolean isRoot = GOD == null ? false : userPrivileges.contains(GOD);
-		return configuration.getUserService4UICA().isUserRoot() || isRoot;
+		return configuration.getUserService4UICA().isGod(auth) || isRoot;
 	}
 
 	private void calculateAccess(Set<Privilege4UICA> userPrivileges, Config4UICA.UICAHolderItem holderItem, Object gotEntity, Set<UICAState> allowed, UICAItemResponse componentAccessResponse) {
@@ -265,7 +268,7 @@ public class UICAService {
 	private Object getEntity(final Map<String, String> params, final String entityType) throws UICAException {
 		if (params != null || !params.isEmpty()) {
 			try {
-				return configuration.resolveEntityService4UICAByEntityType(entityType).get(params);
+				return configuration.getEntityUICAFactory().getService(entityType).get(params);
 			} catch (Exception e) {
 				log.error("", e);
 				throw new UICAException(entityType + " with parameters: '" + params.entrySet().stream().map(o -> o.getKey() + "=" + o.getValue()).collect(Collectors.joining(";")) + "' not found or there was a problem trying to find it");
@@ -275,7 +278,7 @@ public class UICAService {
 	}
 
 	private Set<Privilege4UICA> getUserPrivileges(final String entity) {
-		Map<String, Set<Privilege4UICA>> userPrivilegesMap = configuration.getUserService4UICA().getUserPrivileges();
+		Map<String, Set<Privilege4UICA>> userPrivilegesMap = configuration.getUserService4UICA().getUserPrivilegesByEntity(auth);
 		Set<Privilege4UICA> set = userPrivilegesMap.get(entity);
 		return set == null ? Collections.emptySet() : set;
 	}

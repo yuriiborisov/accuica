@@ -1,6 +1,6 @@
 package code.accessor.core.code;
 
-import code.accessor.core.code.dto.PrivilegeApplicable;
+import code.common.PrivilegeApplicable;
 
 public interface Privilege4Access {
     boolean isFilter();
