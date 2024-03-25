@@ -54,6 +54,7 @@ const routes = [
         meta: {
             breadcrumb: [
                 {name: 'Home', link: '/'},
+                {name: 'UICA', link: '/uica'},
                 {name: 'UICAEditor'}
             ]
         }

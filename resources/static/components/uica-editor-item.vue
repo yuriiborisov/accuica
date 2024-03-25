@@ -1,12 +1,7 @@
 <template>
     <div class="container-xxl">
-      <button class="btn btn-primary" id="toggle-bottom-bar">json editor</button>
-      <div id="bottom-bar" class="d-flex justify-content-between align-items-center">
-            <div id="editor">{}</div>
-        <div>
-          <button class="btn btn-secondary" id="close-bottom-bar">Close</button>
-        </div>
-      </div>
+      <button class="btn btn-primary" id="toggle-bottom-bar">Show editor</button>
+
       <div class="row">
         <div class="col-sm-col- col-main">
           <div class="col">
@@ -16,11 +11,19 @@
             </div>
           </div>
         </div>
-        <div id="groups-column" class="col col-main">
-          <div class="component-header">formID: {{ formId }}</div>
+        <div>
+          <div id="bottom-bar" class="d-flex justify-content-between align-items-center">
+            <div id="editor">{}</div>
+            <div>
+              <button class="btn btn-secondary" id="close-bottom-bar">Close</button>
+            </div>
+          </div>
+          <div id="groups-column" class="col col-main">
+            <div class="component-header">formID: {{ formId }}</div>
+            <!--          <div class="col col-main">-->
             <div class="col mt-3 ">
               <div class="ll">
-                <button id="create-group" v-on:click="handleCreateGroupClick($event)" class="btn btn-primary">New state</button>
+                <button id="create-group" v-on:click="handleCreateGroupClick($event)" class="btn btn-primary mb-3">New state</button>
                 <div class="modal-body">
                   <select class="form-control" id="selectOption">
                     <option value="edit">EDIT</option>
@@ -31,49 +34,39 @@
                 </div>
               </div>
               <div id="component-id-header" class="component-header">componentID: {{ componentId }}</div>
+              <!--<button id="create-group" class="btn btn-primary mb-3">Create new Entity group</button> -->
               <div id="entity-groups"></div>
 
             </div>
+            <!--          </div>-->
+            <!--          <div class="col col-main">-->
+            <!--          <div>-->
             <ul class="nav nav-tabs" id="myTab" role="tablist">
               <li class="nav-item"  v-for="(key, index) in privilegesMapped" :key="index">
-                <a :class="'nav-link ' + (index == 'Other' ? 'active' : '')" v-bind:id="index+'-tab'" data-toggle="tab" v-bind:href="'#'+index" role="tab" v-bind:aria-controls="index" aria-selected="true">{{ index }}</a>
+                <a :class="'nav-link ' + (index === 0 ? 'active' : '')" v-bind:id="index+'-tab'" data-toggle="tab" v-bind:href="'#'+index" role="tab" v-bind:aria-controls="index" aria-selected="true">{{ index }}</a>
               </li>
             </ul>
+            <!--          </div>-->
             <div class="tab-content" id="myTabContent">
-              <div  v-for="(key, index) in privilegesMapped" :key="index" :class="'tab-pane fade ' + (index == 'Other' ? 'show active' : '')" v-bind:id="index" role="tabpanel" v-bind:aria-labelledby="index+'-tab'">
+              <div  v-for="(key, index) in privilegesMapped" :key="index" :class="'tab-pane fade ' + (index === 0 ? 'show active' : '')" v-bind:id="index" role="tabpanel" v-bind:aria-labelledby="index+'-tab'">
+                <!--              <div class="col mt-3">-->
+                <!--                <div>-->
                 <div class="item" draggable="true" v-for="(item, index) in key" :key="index">{{ item.id }}</div>
+                <!--                </div>-->
+
+                <!--              </div>-->
               </div>
             </div>
-        </div>
-      </div>
 
+            <!--          <div class="col mt-3">-->
+            <!--            <div class="item" draggable="true" v-for="(item, index) in privileges" :key="item.id">{{ item.id }}</div>-->
+            <!--          </div>-->
+            <!--          </div>-->
+          </div>
+        </div>
+
+      </div>
     </div>
-    <!-- Popup Modal -->
-<!--    <div class="modal fade" id="popupModal" tabindex="-1" role="dialog" aria-labelledby="popupModalLabel" aria-hidden="true">-->
-<!--      <div class="modal-dialog" role="document">-->
-<!--        <div class="modal-content">-->
-<!--          <div class="modal-header">-->
-<!--            <h5 class="modal-title" id="popupModalLabel">Select Option</h5>-->
-<!--            <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
-<!--              <span aria-hidden="true">&times;</span>-->
-<!--            </button>-->
-<!--          </div>-->
-<!--          <div class="modal-body">-->
-<!--            <select class="form-control" id="selectOption">-->
-<!--              <option value="edit">EDIT</option>-->
-<!--              <option value="read">READ</option>-->
-<!--              <option value="hidden">HIDDEN</option>-->
-<!--              <option value="create">CREATE</option>-->
-<!--            </select>-->
-<!--          </div>-->
-<!--          <div class="modal-footer">-->
-<!--            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-<!--            <button type="button" class="btn btn-primary" id="addOption">Add</button>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
 </template>
 
 <script>
@@ -317,7 +310,7 @@ module.exports = {
       // this.jsonRow = new Object(this.json);
       this.main();
       $(".component-id").each( function(i,o){$(o).removeClass('active')});
-
+      
       $(event.target).addClass("active");
       // this.forceRerender()
       console.log('json',JSON.stringify(this.json));
@@ -402,15 +395,10 @@ module.exports = {
         e.rev = rev;
 
         var groupElement = $('<div>').attr('state',stateLower).attr('rev',rev);
-        var name = $('<div>').addClass('group-header').text(state);
-
+        var name = $('<div>').addClass('group-header').text(state + (entity == null ? '' : " ("+entity+")"));
         var groupElementMain = $('<div>').addClass('entity-group').attr('state',stateLower).attr('rev',rev);
         groupElementMain.append(name);
         groupElementMain.append(groupElement);
-        if(entity !== null){
-          var enityLabelSpan = $('<span>').addClass('entity-label badge badge-dark').text(entity);
-          groupElementMain.append(enityLabelSpan);
-        }
         var deleteButton = $('<button>').addClass('btn btn-danger btn-sm delete-button').attr('state',stateLower).attr('rev',rev).text('Delete').click(function() {
           groupElementMain.remove();
           let find = jsonPath(app.jsonRow, "$.[?(@.state=='"+ state +"' && @.rev=="+$(this).attr("rev")+")]")[0];
@@ -507,7 +495,6 @@ module.exports = {
  // box-shadow: 2px 3px 10px 3px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
   margin: 10px;
-  overflow: hidden;
 }
 .item {
   display: inline-block;
@@ -563,7 +550,7 @@ module.exports = {
   align-items: center;
 }
 #create-group {
-  //height: 50px;
+  height: 50px;
   margin: 5px;
 }
 .ui-droppable-hover{
@@ -664,12 +651,5 @@ textarea {
 div[state] {
   display: flex;
   flex-direction: column;
-}
-.entity-label {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  font-size: 12px;
-  padding: 2px 5px;
 }
 </style>

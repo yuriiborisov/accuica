@@ -54,9 +54,9 @@ public class UICAPrivilegeController {
 		privilegeService4UICA.getAll().forEach( p -> {
 			PrivilegeApplicable applicable = p.getApplicable();
 			if(applicable == null){
-				List<Privilege4UICA> list = result.get("All") == null ? new ArrayList<>() : result.get("All");
+				List<Privilege4UICA> list = result.get("Other") == null ? new ArrayList<>() : result.get("Other");
 				list.add(p);
-				result.put("All", list);
+				result.put("Other", list);
 			}else{
 				applicable.getEntities().forEach(entity -> {
 					List<Privilege4UICA> list = result.get(entity) == null ? new ArrayList<>() : result.get(entity);
