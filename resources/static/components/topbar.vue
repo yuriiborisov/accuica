@@ -64,7 +64,7 @@ module.exports = {
 </script>
 <style>
 .navbar {
-  margin-bottom: 15px;
+  margin-bottom: 5px;
 }
 
 .sidebar a {

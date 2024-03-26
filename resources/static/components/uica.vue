@@ -74,4 +74,68 @@ module.exports = {
 .container-xxl{
   width: 100%;
 }
+
+.uica-panel .table-container {
+  width: 90vw;
+  overflow-x: auto;
+}
+.uica-panel .table-container table {
+  font-size: 12px; /* Set the minimum font size */
+}
+/* Table with horizontal scroll */
+.uica-panel .table-container {
+  max-width: 100%;
+  overflow-x: auto;
+  height: 70vh;
+}
+
+.uica-panel .table-fixed {
+  overflow-y: auto;
+}
+.uica-panel  table thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #fff;
+}
+.uica-panel  table tbody th {
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 1;
+}
+
+/* Fixed first column */
+.uica-panel .table-fixed thead td:first-child,
+.uica-panel .table-fixed tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: #fff;
+  max-width: 250px;
+  overflow: hidden;
+
+}
+
+.uica-panel .table-fixed thead tr:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+  background-color: #fff;
+
+
+}
+
+.uica-panel .table-fixed thead tr td:first-child{
+  background-color: #959595;
+  color:#fff;
+}
+
+.uica-panel .table-fixed thead tr {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 20;
+
+}
 </style>

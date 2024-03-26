@@ -1,8 +1,8 @@
 
 <template>
   <div class="matrix-panel">
-    <h2>Privileges/Actions matrix for role '{{roleId}}': </h2>
     <div class="container-xxl">
+      <h6>Privileges/Actions matrix for role '{{roleId}}': </h6>
       <div class="table-container">
         <table class="table table-fixed data-show-columns table-striped" id="roleMatrixTable">
           <thead id="roleMatrixTableHeader">
@@ -33,8 +33,8 @@
           </tbody>
         </table>
       </div>
+      <button id="save-role-btn" class="btn btn-primary save-btn" v-on:click="this.handleSaveButton">Save</button>
     </div>
-    <button class="btn btn-primary save-btn" v-on:click="this.handleSaveButton">Save</button>
   </div>
 </template>
 
@@ -206,34 +206,34 @@ module.exports = {
 <style>
 
 /* Table with horizontal scroll */
-.table-container {
+.matrix-panel .table-container {
   max-width: 100%;
   overflow-x: auto;
   height: 70vh;
 }
 
 
-.table-fixed {
+.matrix-panel .table-fixed {
   overflow-y: auto;
 }
-table thead th:first-child {
+.matrix-panel table thead th:first-child {
   position: sticky;
   left: 0;
   z-index: 2;
 }
-table tbody th {
+.matrix-panel table tbody th {
   position: sticky;
   left: 0;
   background: white;
   z-index: 1;
 }
-.table-fixed tbody td:first-child p {
+.matrix-panel .table-fixed tbody td:first-child p {
   padding: 0;
   margin: 0;
 }
 /* Fixed first column */
-.table-fixed thead td:first-child,
-.table-fixed tbody td:first-child {
+.matrix-panel .table-fixed thead td:first-child,
+.matrix-panel .table-fixed tbody td:first-child {
   position: sticky;
   left: 0;
   z-index: 2;
@@ -244,7 +244,7 @@ table tbody th {
   font-size: 9pt;
 }
 
-.table-fixed thead tr:first-child {
+.matrix-panel .table-fixed thead tr:first-child {
   position: sticky;
   left: 0;
   z-index: 20;
@@ -252,13 +252,13 @@ table tbody th {
   font-size: 9pt
 }
 
-.table-fixed thead tr td:first-child{
+.matrix-panel .table-fixed thead tr td:first-child{
   background-color: #959595;
   color:#fff;
   font-size: 9pt
 }
 
-.table-fixed thead tr {
+.matrix-panel .table-fixed thead tr {
   position: sticky;
   top: 0;
   background-color: #fff;
@@ -281,5 +281,12 @@ input[type="checkbox"], input[type="radio"] {
 .extended {
   font-size: 6pt;
   color: #898989;
+}
+.matrix-panel .container-xxl{
+  flex-direction: column;
+  height: 75vh;
+}
+#save-role-btn {
+  width: 100px;
 }
 </style>

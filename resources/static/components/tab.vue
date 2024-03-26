@@ -51,4 +51,8 @@ module.exports = {
 .nav-tabs {
   margin-bottom: 15px;
 }
+.main-content {
+  width: 100vw;
+  padding: 0px 20px 0px 20px;
+}
 </style>

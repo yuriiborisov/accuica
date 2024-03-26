@@ -34,3 +34,7 @@
 .new-button {
     margin: 1rem 0 0 1rem;
 }
+.background-light{
+    background: #efefef;
+    padding: 5px;
+}

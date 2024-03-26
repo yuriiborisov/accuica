@@ -126,30 +126,30 @@ module.exports = {
 };
 </script>
 <style>
-.table-container {
+.roles-panel .table-container {
   width: 90vw;
   overflow-x: auto;
 }
-.table-container table {
+.roles-panel .table-container table {
   font-size: 12px; /* Set the minimum font size */
 }
 /* Table with horizontal scroll */
-.table-container {
+.roles-panel .table-container {
   max-width: 100%;
   overflow-x: auto;
   height: 70vh;
 }
 
-.table-fixed {
+.roles-panel .table-fixed {
   overflow-y: auto;
 }
-table thead th:first-child {
+.roles-panel table thead th:first-child {
   position: sticky;
   left: 0;
   z-index: 2;
   background: #fff;
 }
-table tbody th {
+.roles-panel table tbody th {
   position: sticky;
   left: 0;
   background: white;
@@ -157,8 +157,8 @@ table tbody th {
 }
 
 /* Fixed first column */
-.table-fixed thead td:first-child,
-.table-fixed tbody td:first-child {
+.roles-panel.table-fixed thead td:first-child,
+.roles-panel.table-fixed tbody td:first-child {
   position: sticky;
   left: 0;
   z-index: 2;

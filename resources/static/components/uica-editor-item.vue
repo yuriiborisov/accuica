@@ -1,105 +1,57 @@
 <template>
-    <div class="container-xxl">
-      <button class="btn btn-primary" id="toggle-bottom-bar">Show editor</button>
-
-      <div class="row">
-        <div class="col-sm-col- col-main">
-          <div class="col">
-            <div class="col mt-3 components">
-              <div :class="'component-id ' + (index == 0 ? 'active' : '')" v-for="(component, index) in privileges?.config?.componentAccess" :key="component.componentId" v-on:click="handleFormIdClick($event, component.componentId)">
-                {{ component.componentId }}</div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div id="bottom-bar" class="d-flex justify-content-between align-items-center">
-            <div id="editor">{}</div>
-            <div>
-              <button class="btn btn-secondary" id="close-bottom-bar">Close</button>
-            </div>
-          </div>
-          <div id="groups-column" class="col col-main">
-            <div class="component-header">formID: {{ formId }}</div>
-            <!--          <div class="col col-main">-->
-            <div class="col mt-3 ">
-              <div class="ll">
-                <button id="create-group" v-on:click="handleCreateGroupClick($event)" class="btn btn-primary mb-3">New state</button>
-                <div class="modal-body">
-                  <select class="form-control" id="selectOption">
-                    <option value="edit">EDIT</option>
-                    <option value="read">READ</option>
-                    <option value="hidden">HIDDEN</option>
-                    <option value="create">CREATE</option>
-                  </select>
-                </div>
-              </div>
-              <div id="component-id-header" class="component-header">componentID: {{ componentId }}</div>
-              <!--<button id="create-group" class="btn btn-primary mb-3">Create new Entity group</button> -->
-              <div id="entity-groups"></div>
-
-            </div>
-            <!--          </div>-->
-            <!--          <div class="col col-main">-->
-            <!--          <div>-->
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-              <li class="nav-item"  v-for="(key, index) in privilegesMapped" :key="index">
-                <a :class="'nav-link ' + (index === 0 ? 'active' : '')" v-bind:id="index+'-tab'" data-toggle="tab" v-bind:href="'#'+index" role="tab" v-bind:aria-controls="index" aria-selected="true">{{ index }}</a>
-              </li>
-            </ul>
-            <!--          </div>-->
-            <div class="tab-content" id="myTabContent">
-              <div  v-for="(key, index) in privilegesMapped" :key="index" :class="'tab-pane fade ' + (index === 0 ? 'show active' : '')" v-bind:id="index" role="tabpanel" v-bind:aria-labelledby="index+'-tab'">
-                <!--              <div class="col mt-3">-->
-                <!--                <div>-->
-                <div class="item" draggable="true" v-for="(item, index) in key" :key="index">{{ item.id }}</div>
-                <!--                </div>-->
-
-                <!--              </div>-->
-              </div>
-            </div>
-
-            <!--          <div class="col mt-3">-->
-            <!--            <div class="item" draggable="true" v-for="(item, index) in privileges" :key="item.id">{{ item.id }}</div>-->
-            <!--          </div>-->
-            <!--          </div>-->
-          </div>
-        </div>
-
+  <div id="groups-column" class="col col-main">
+    <button class="btn btn-outline-dark" id="toggle-bottom-bar">json editor</button>
+    <div id="bottom-bar" class="d-flex justify-content-between align-items-center">
+      <div id="editor">{}</div>
+      <div>
+        <button class="btn btn-secondary" id="close-bottom-bar">Close</button>
       </div>
     </div>
+    <div class="component-header" >ComponentID: {{ componentId }}</div>
+<!--    <div class="component-header">formID: {{ formId }}</div>-->
+    <div class="col ">
+      <div class="ll">
+        <button id="create-group" v-on:click="handleCreateGroupClick($event)" class="btn btn-outline-primary">New state</button>
+        <div class="modal-body">
+          <select class="form-control" id="selectOption">
+            <option value="edit">EDIT</option>
+            <option value="read">READ</option>
+            <option value="hidden">HIDDEN</option>
+            <option value="create">CREATE</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="entity-groups"></div>
+
+    </div>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item"  v-for="(key, index) in privilegesMapped" :key="index">
+        <a :class="'nav-link ' + (index == 'Other' ? 'active' : '')" v-bind:id="index+'-tab'" data-toggle="tab" v-bind:href="'#'+index" role="tab" v-bind:aria-controls="index" aria-selected="true">{{ index }}</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div  v-for="(key, index) in privilegesMapped" :key="index" :class="'tab-pane fade ' + (index == 'Other' ? 'show active' : '')" v-bind:id="index" role="tabpanel" v-bind:aria-labelledby="index+'-tab'">
+        <div class="item" draggable="true" v-for="(item, index) in key" :key="index">{{ item.id }}</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 module.exports = {
+  props:{
+    componentId:String,
+    privileges: Object
+  },
   data(){
     return{
       editor: undefined,
-      privileges: undefined,
+      // privileges: undefined,
       privilegesMapped: undefined,
-      componentId:undefined,
-      json: [
-        {
-          "scope": "READ",
-          "privileges": [
-            "REQUEST_EDIT_BY_ISSUER_OR_TASK_EXECUTOR",
-            "REQUEST_EDIT_FOR_VTD_VTC_CNR",
-            "REQUEST_EDIT_FOR_RTD_RTC_VTD_VTC_CNR",
-            "REQUEST_EDIT_BY_TASK_EXECUTOR",
-            "Item 8",
-            "READ",
-            "Itthrgfeem 9"
-          ]
-        },
-        {
-          "scope": "HIDDEN",
-          "privileges": [
-            "REQUEST_EDIT_FOR_RTD_RTC_VTD_VTC_CNR",
-            "REQUEST_EDIT_FOR_VTD_VTC_CNR",
-            "REQUEST_EDIT_BY_ISSUER_OR_TASK_EXECUTOR"
-          ]
-        }
-      ],
-      jsonRow: [],
+      // componentId: this.componentIdProp,
+      json: undefined,
+      jsonRow: undefined,
 
       replacer: (key, value) => {
         if(key == "rev"){ return undefined;}else return value;
@@ -107,23 +59,25 @@ module.exports = {
     }
   },
   async created(){
-    // const app = this;
-    this.privilegesMapped = await fetcher.fetch('/uica/privilege/get-all-m', 'GET',{
+    // console.log("CREATED_JSON", this.privileges)
+     this.privilegesMapped = await fetcher.fetch('/uica/privilege/get-all-m', 'GET',{
       'Content-Type': 'application/json',
     });
-    this.privileges = await this.fetchPrivilege();
-    let initComponentId = this.privileges?.config?.componentAccess[0].componentId
-    console.log('initComponentId', initComponentId);
-    this.json = jsonPath(this.privileges?.config?.componentAccess,"$[?(@.componentId == '"+initComponentId+"')].states[*]");
-    this.componentId = initComponentId;
-    console.log('json', this.json);
+    // this.privileges = await this.fetchPrivilege();
+    // let initComponentId = this.privileges?.config?.componentAccess[0].componentId
+    // console.log('initComponentId', initComponentId);
+    // this.json = jsonPath(this.privileges?.config?.componentAccess,"$[?(@.componentId == '"+this.componentId+"')].states[*]");
+    // this.componentId = initComponentId;
+    // console.log('json', this.json);
 
 
     this.initEditor();
-    this.main();
+    // this.main();
 
   },
   updated(){
+    // this.json = jsonPath(this.privileges?.config?.componentAccess,"$[?(@.componentId == '"+this.componentId+"')].states[*]");
+
     // this.main();
     $('#toggle-bottom-bar').click(function() {
       $('#bottom-bar').addClass('show');
@@ -134,7 +88,12 @@ module.exports = {
       $('#bottom-bar').removeClass('show');
       $('#groups-column').removeClass('groups-min');
     });
-    console.log("@@@@@@@@@@@@ITEMS", $('.item'));
+    console.log("this.componentId", this.componentId);
+    this.json = jsonPath(this.privileges?.config?.componentAccess,"$[?(@.componentId == '"+this.componentId+"')].states[*]");
+
+    console.log("this.json", JSON.stringify(this.json));
+    this.initEditor();
+    this.main();
     // Make items draggable
     $('.item').draggable({
       helper: 'clone',
@@ -395,10 +354,14 @@ module.exports = {
         e.rev = rev;
 
         var groupElement = $('<div>').attr('state',stateLower).attr('rev',rev);
-        var name = $('<div>').addClass('group-header').text(state + (entity == null ? '' : " ("+entity+")"));
+        var name = $('<div>').addClass('group-header').text(state);
         var groupElementMain = $('<div>').addClass('entity-group').attr('state',stateLower).attr('rev',rev);
         groupElementMain.append(name);
         groupElementMain.append(groupElement);
+        if(entity !== null){
+          var enityLabelSpan = $('<span>').addClass('entity-label badge badge-secondary').text(entity);
+          groupElementMain.append(enityLabelSpan);
+        }
         var deleteButton = $('<button>').addClass('btn btn-danger btn-sm delete-button').attr('state',stateLower).attr('rev',rev).text('Delete').click(function() {
           groupElementMain.remove();
           let find = jsonPath(app.jsonRow, "$.[?(@.state=='"+ state +"' && @.rev=="+$(this).attr("rev")+")]")[0];
@@ -490,11 +453,13 @@ module.exports = {
   //border: 1px solid #ddd;
   border: 2px solid #2c6bff5e;
   margin-bottom: 15px;
+  background-color: #2c6bff14;
   padding: 10px;
   position: relative;
  // box-shadow: 2px 3px 10px 3px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
   margin: 10px;
+  overflow: hidden;
 }
 .item {
   display: inline-block;
@@ -550,7 +515,7 @@ module.exports = {
   align-items: center;
 }
 #create-group {
-  height: 50px;
+  //height: 50px;
   margin: 5px;
 }
 .ui-droppable-hover{
@@ -590,6 +555,9 @@ textarea {
   padding-right: 20px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 2px solid #2c6bff5e;
+  margin-bottom: 15px;
+  padding: 10px;
 }
 
 #bottom-bar {
@@ -623,18 +591,12 @@ textarea {
   top: 20px;
   right: 20px;
 }
-.component-id:hover {
-  cursor: pointer;
-  color: #2c6bff;
-}
+
+
 .active{
   color: #2c6bff;
 }
 
-.components {
-  height: 60vh;
-  overflow-y: scroll;
-}
 .nav-tabs .nav-item {
   font-size: 8pt;
 }
@@ -651,5 +613,15 @@ textarea {
 div[state] {
   display: flex;
   flex-direction: column;
+}
+.entity-label {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  font-size: 9px;
+}
+#selectOption {
+  max-width: 200px;
+  cursor: pointer;
 }
 </style>

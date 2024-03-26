@@ -67,30 +67,30 @@ module.exports = {
 };
 </script>
 <style>
-.table-container {
+.privileges-panel .table-container {
   width: 90vw;
   overflow-x: auto;
 }
-.table-container table {
+.privileges-panel .table-container table {
   font-size: 12px; /* Set the minimum font size */
 }
 /* Table with horizontal scroll */
-.table-container {
+.privileges-panel .table-container {
   max-width: 100%;
   overflow-x: auto;
   height: 70vh;
 }
 
-.table-fixed {
+.privileges-panel .table-fixed {
   overflow-y: auto;
 }
-table thead th:first-child {
+.privileges-panel  table thead th:first-child {
   position: sticky;
   left: 0;
   z-index: 2;
   background: #fff;
 }
-table tbody th {
+.privileges-panel  table tbody th {
   position: sticky;
   left: 0;
   background: white;
@@ -98,8 +98,8 @@ table tbody th {
 }
 
 /* Fixed first column */
-.table-fixed thead td:first-child,
-.table-fixed tbody td:first-child {
+.privileges-panel .table-fixed thead td:first-child,
+.privileges-panel .table-fixed tbody td:first-child {
   position: sticky;
   left: 0;
   z-index: 2;
@@ -109,7 +109,7 @@ table tbody th {
 
 }
 
-.table-fixed thead tr:first-child {
+.privileges-panel .table-fixed thead tr:first-child {
   position: sticky;
   left: 0;
   z-index: 20;
@@ -118,12 +118,12 @@ table tbody th {
 
 }
 
-.table-fixed thead tr td:first-child{
+.privileges-panel .table-fixed thead tr td:first-child{
   background-color: #959595;
   color:#fff;
 }
 
-.table-fixed thead tr {
+.privileges-panel .table-fixed thead tr {
   position: sticky;
   top: 0;
   background-color: #fff;
