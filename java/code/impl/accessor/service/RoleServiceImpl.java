@@ -10,6 +10,7 @@ import code.impl.accessor.entity.GrantAccessEntityPk;
 import code.impl.accessor.entity.PrivilegeEntity;
 import code.impl.accessor.entity.RoleEntity;
 import code.impl.accessor.mapper.RoleMapperImpl;
+import code.impl.accessor.repository.RoleRepository;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,14 @@ import java.util.stream.Collectors;
 public class RoleServiceImpl extends Role4AccessBaseAbstract implements RoleService4Access {
 	private final AccessRepository $;
 	private final RoleMapperImpl mapper;
+	private final RoleRepository roleRepository;
 
-	public RoleServiceImpl(final AccessRepository $, final RoleMapperImpl mapper, PrivilegeServiceImpl privilegeService) {
+	public RoleServiceImpl(final AccessRepository $, final RoleMapperImpl mapper, PrivilegeServiceImpl privilegeService,
+						   RoleRepository roleRepository) {
 		super(privilegeService);
 		this.$ = $;
 		this.mapper = mapper;
+		this.roleRepository = roleRepository;
 	}
 	@Override
 	public Role4AccessResponse update(Role4AccessRequestV2 requestV2){
@@ -55,6 +59,18 @@ public class RoleServiceImpl extends Role4AccessBaseAbstract implements RoleServ
 			}
 		});
 		grantAccessList.addAll(grantAccessNewList);
+		RoleEntity saved = $.getRolesRepo().save(roleEntity);
+		return mapper.map(saved);
+	}
+
+	@Override
+	public Role4AccessResponse updateInfo(Role4AccessRequest request) {
+		RoleEntity roleEntity = $.getRolesRepo().findById(request.getId()).orElseThrow(() -> new RoleException("Role with id: '" + request.getId() + "' not found!"));
+		RoleEntity parentRoleEntity = $.getRolesRepo().findById(request.getParentId()).orElseThrow(() -> new RoleException("Role with id: '" + request.getId() + "' not found!"));
+		roleEntity.setName(request.getName());
+		roleEntity.setParent(parentRoleEntity);
+		roleEntity.setDescription(request.getDescription());
+		roleEntity.setSortOrder(request.getSortOrder());
 		RoleEntity saved = $.getRolesRepo().save(roleEntity);
 		return mapper.map(saved);
 	}

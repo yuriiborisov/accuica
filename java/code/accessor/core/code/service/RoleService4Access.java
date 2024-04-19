@@ -10,6 +10,8 @@ import java.util.List;
 public interface RoleService4Access {
     Role4AccessResponse getById(String id);
     Role4AccessResponse update(Role4AccessRequestV2 requestV2);
+
+    Role4AccessResponse updateInfo(Role4AccessRequest request);
     void delete(String id);
 
     Role4AccessResponse create(Role4AccessRequest request);

@@ -87,17 +87,31 @@ public class RoleController {
 		return ResponseEntity.ok().body(result);
 	}
 
+//	@Operation(
+//			summary = "Update Role.",
+//			description = "Return Role. ",
+//			tags = {"ROLE"}
+//	)
+//	@PutMapping("")
+//	ResponseEntity<?> updateRoleMatrix(@RequestBody Role4AccessRequestV2 request ) throws BaseException{
+//		if(request == null){
+//			ResponseEntity.status(HttpStatus.CONFLICT);
+//		}
+//		Role4AccessResponse result = configuration.getRoleService4Access().update(request);
+//		return ResponseEntity.ok().body(result);
+//	}
+
 	@Operation(
 			summary = "Update Role.",
 			description = "Return Role. ",
 			tags = {"ROLE"}
 	)
 	@PutMapping("/info")
-	ResponseEntity<?> updateInfo(@RequestBody Role4AccessRequestV2 request ) throws BaseException{
+	ResponseEntity<?> updateInfo(@RequestBody Role4AccessRequest request ) throws BaseException{
 		if(request == null){
 			ResponseEntity.status(HttpStatus.CONFLICT);
 		}
-		Role4AccessResponse result = configuration.getRoleService4Access().update(request);
+		Role4AccessResponse result = configuration.getRoleService4Access().updateInfo(request);
 		return ResponseEntity.ok().body(result);
 	}
 
