@@ -20,6 +20,7 @@ public class PrivilegeMapper4Uica {
         privilege.setCalculated( entity.isCalculated() );
         privilege.setStatementScript( entity.getStatementScript() );
         privilege.setUica( entity.isUica() );
+        privilege.setDescription( entity.getDescription() );
         privilege.setApplicable( entity.getApplicable() );
 
         return privilege;

@@ -102,9 +102,9 @@ module.exports = {
       })
     },
     async getAllRoles(){
-      `return await fetcher.fetch('/method/get-all', 'GET',{
+      return await fetcher.fetch('/method/get-all', 'GET',{
           'Content-Type': 'application/json',
-        });`
+        });
     }
   },
   components: {
