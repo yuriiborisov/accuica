@@ -1,0 +1,745 @@
+<template>
+  <div id="groups-column" class="col col-main">
+    <button class="btn btn-outline-dark" id="toggle-bottom-bar">json editor</button>
+    <div id="bottom-bar" class="d-flex justify-content-between align-items-center">
+      <div id="editor">{}</div>
+      <div>
+        <button class="btn btn-secondary" id="close-bottom-bar">Close</button>
+      </div>
+    </div>
+    <div class="component-header" >ComponentID: {{ componentId }} <span class="pencil-edit" v-on:click="showPopupComponent"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"></path>
+      </svg></span></div>
+<!--    <div class="component-header">formID: {{ formId }}</div>-->
+    <div class="col ">
+      <div class="ll">
+        <button id="create-group" v-on:click="handleCreateGroupClick($event)" class="btn btn-outline-primary">New state</button>
+        <div class="modal-body">
+          <select class="form-control" id="selectOption">
+            <option value="edit">EDIT</option>
+            <option value="read">READ</option>
+            <option value="hidden">HIDDEN</option>
+            <option value="create">CREATE</option>
+          </select>
+        </div>
+        <button id="save-uica" v-on:click="handleEditComponentStatesClick($event)" class="btn btn-outline-primary">Save</button>
+      </div>
+
+      <div id="entity-groups"></div>
+
+    </div>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item"  v-for="(key, index) in privilegesMapped" :key="index">
+        <a :class="'nav-link ' + (index == 'Other' ? 'active' : '')" v-bind:id="index+'-tab'" data-toggle="tab" v-bind:href="'#'+index" role="tab" v-bind:aria-controls="index" aria-selected="true">{{ index }}</a>
+      </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+      <div  v-for="(key, index) in privilegesMapped" :key="index" :class="'tab-pane fade ' + (index == 'Other' ? 'show active' : '')" v-bind:id="index" role="tabpanel" v-bind:aria-labelledby="index+'-tab'">
+        <div class="item" draggable="true" v-for="(item, index) in key" :key="index">{{ item.id }}</div>
+      </div>
+    </div>
+    <div class="modal fade" id="popupModalComponent" tabindex="-1" role="dialog" aria-labelledby="popupModalComponentLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <!--          <h2>Create Form</h2>-->
+        <form id="editComponentForm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="popupModalComponentLabel">Form edit</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                  <label for="name">Name</label>
+                  <input type="text" class="form-control" id="name" name="name" :value="componentId">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" v-on:click="handleDeleteComponentClick($event)">Delete</button>
+              <button type="button" class="btn btn-primary" id="addOption" v-on:click="handleEditComponentClick($event)">Edit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</template>
+
+<script>
+module.exports = {
+  props:{
+    component:String,
+    privilegess: Object
+  },
+  data(){
+    return{
+      editor: undefined,
+      privileges: Object,
+      privilegesMapped: undefined,
+      componentId: String,
+      json: undefined,
+      jsonRow: undefined,
+
+      replacer: (key, value) => {
+        if(key == "rev"){ return undefined;}else return value;
+      }
+    }
+  },
+  async mounted(){
+    console.log("m-componentId", this.componentId);
+    console.log("m-component", this.component);
+    this.privilegesMapped = await fetcher.fetch('/uica/privilege/get-all-m', 'GET',{
+      'Content-Type': 'application/json',
+    });
+  },
+  async created(){
+    console.log("c-componentId", this.componentId);
+    console.log("c-component", this.component);
+
+    // console.log("CREATED_JSON", this.privileges)
+     this.privilegesMapped = await fetcher.fetch('/uica/privilege/get-all-m', 'GET',{
+      'Content-Type': 'application/json',
+    });
+    console.log("c-privilegesMapped", this.privilegesMapped);
+    // this.privileges = await this.fetchPrivilege();
+    // let initComponentId = this.privileges?.config?.componentAccess[0].componentId
+    // console.log('initComponentId', initComponentId);
+    // this.json = jsonPath(this.privileges?.config?.componentAccess,"$[?(@.componentId == '"+this.componentId+"')].states[*]");
+    // this.componentId = initComponentId;
+    // console.log('json', this.json);
+
+
+    this.initEditor();
+    // this.main();
+
+  },
+  watch:{
+    component(val){
+      this.componentId = val;
+    },
+    privilegess(val){
+      console.log("####", val);
+      this.privileges = val;
+    }
+  },
+  updated(){
+    // this.json = jsonPath(this.privileges?.config?.componentAccess,"$[?(@.componentId == '"+this.componentId+"')].states[*]");
+    // this.componentId = this.component;
+    // this.privileges = this.privilegess;
+    // console.log("u-componentId", this.componentId);
+    // console.log("u-component", this.component);
+    // console.log("u-privileges", JSON.stringify(this.privileges));
+    // console.log("u-privileges-prop", JSON.stringify(this.privilegess));
+
+    // this.main();
+    $('#toggle-bottom-bar').click(function() {
+      $('#bottom-bar').addClass('show');
+      $('#groups-column').addClass('groups-min');
+    });
+
+    $('#close-bottom-bar').click(function() {
+      $('#bottom-bar').removeClass('show');
+      $('#groups-column').removeClass('groups-min');
+    });
+    // console.log("this.componentId", this.componentId);
+    this.json = jsonPath(this.privileges?.config?.componentAccess,"$[?(@.componentId == '"+this.componentId+"')].states[*]");
+
+    // console.log("this.json", JSON.stringify(this.json));
+    this.initEditor();
+    this.main();
+    // Make items draggable
+    $('.item').draggable({
+      helper: 'clone',
+      cursor: 'move'
+    });
+  },
+  computed: {
+    formId() {
+      return this.$route.query.formId;
+    },
+
+  },
+  methods:{
+    showPopupComponent(){
+      $('#popupModalComponent').modal('show');
+    },
+    async forceRerender() {
+      // Remove MyComponent from the DOM
+      this.renderComponent = false;
+
+      // Wait for the change to get flushed to the DOM
+      await this.$nextTick();
+
+      // Add the component back in
+      this.renderComponent = true;
+    },
+    initEditor(){
+      this.editor = ace.edit("editor");
+      this.editor.setTheme("ace/theme/monokai");
+      this.editor.session.setMode("ace/mode/json");
+      this.editor.setOptions({
+        fontSize: "9pt",
+        // fontFamily: "tahoma",
+        // useWrapMode: true,
+        // indentedSoftWrap: false,
+        // behavioursEnabled: false, // disable autopairing of brackets and tags
+        // showLineNumbers: true,
+        wrap: true// hide the gutter
+      });
+    },
+    main(){
+      const app = this;
+
+      // app.json = app.privileges?.config?.componentAccess[0]?.states;
+      // app.comonentId = app.privileges?.config?.componentAccess[0]?.componentId;
+      // console.log('app.json', app.json);
+      app.jsonRow = new Object(app.json);
+      // console.log('jsonRow1', app.jsonRow);
+      // Initialize Ace Editor
+
+      app.editor.setValue(JSON.stringify(app.jsonRow, app.replacer, 2), -1);
+      // Add event listener for changes
+      app.editor.on("change", function() {
+        try {
+          app.jsonRow = JSON.parse(app.editor.getValue());
+          app.editor.value = JSON.stringify(app.json);
+          app.createFromJson(app.jsonRow);
+          app.editor.container.style.borderColor = "green";
+        } catch (e) {
+          app.editor.container.style.borderColor = "red";
+        }
+      });
+      // console.log("@@@@@@@@@@@@1", app.jsonRow);
+      app.createFromJson(app.jsonRow);
+      // console.log('jsonRow2', app.jsonRow);
+      // Handle the "Add" button click in the popup
+      // $('#create-group').click(function() {
+      //   var selectedOption = $('#selectOption').val();
+      //   var rev = 0;
+      //   var group = {
+      //     state: selectedOption.toUpperCase(),
+      //     entity: null,
+      //     rev: rev,
+      //     privileges: []
+      //   };
+      //   console.log('jsonRow3', app.jsonRow);
+      //   var isExist = app.jsonRow.find(g => g.state === selectedOption.trim().toUpperCase());
+      //   if(isExist){
+      //     let findDuplicates = jsonPath(app.jsonRow, "$.[?(@.state=='"+selectedOption.toUpperCase()+"')]");
+      //     let size = findDuplicates.length-1
+      //     rev = size + 1;
+      //     group.rev = rev;
+      //   }
+      //   app.jsonRow.push(group);
+      //   console.log("@@@@@@@@@@@@2");
+      //   var groupElement = $('<div>').attr('state',selectedOption).attr('rev',rev);
+      //   var name = $('<div>').addClass('group-header').text(selectedOption.toUpperCase());
+      //   var groupElementMain = $('<div>').addClass('entity-group').attr('state',selectedOption).attr('rev',rev);
+      //   groupElementMain.append(name);
+      //   groupElementMain.append(groupElement);
+      //
+      //   var deleteButton = $('<button>').addClass('btn btn-danger btn-sm delete-button').attr('state',selectedOption).attr('rev',rev).text('Delete')
+      //       .click(e => {
+      //         groupElementMain.remove();
+      //         let find = jsonPath(app.jsonRow, "$.[?(@.state=='"+ selectedOption.toUpperCase()+"' && @.rev=="+ $(this).attr("rev")+")]")[0];
+      //         var groupIndex = app.jsonRow.findIndex(g => g === find);
+      //         if (groupIndex !== -1) {
+      //           app.jsonRow.splice(groupIndex, 1);
+      //         }
+      //         app.updateJsonRepresentation(app.jsonRow);
+      //       });
+      //   console.log("@@@@@@@@@@@@3");
+      //   $('#entity-groups').append(groupElementMain);
+      //   $(".entity-group[state="+selectedOption+"][rev="+rev+"]").append(deleteButton);
+      //   app.makeGroupDroppable(groupElementMain);
+      //   app.editor.setValue(JSON.stringify(app.jsonRow, app.replacer, 2), -1);
+      //   app.updateJsonRepresentation(app.jsonRow);
+      //   $('#popupModal').modal('hide'); // Close the popup
+      //
+      // });
+
+      // console.log("@@@@@@@@@@@@ITEMS", $('.item'));
+      // Make items draggable
+      $('.item').draggable({
+        helper: 'clone',
+        cursor: 'move'
+      });
+      // console.log("@@@@@@@@@@@@4");
+      // Make existing groups droppable
+      $('.entity-group').each(function() {
+        app.makeGroupDroppable($(this));
+      });
+      console.log("$('.entity-group')", $('.entity-group'));
+      // console.log("@@@@@@@@@@@@5");
+      // Function to make a group droppabl
+
+      // Function to update the JSON representation
+    },
+    async handleEditComponentStatesClick(event){
+      const data = {
+        formId: this.formId,
+        componentId: this.componentId,
+        states: this.jsonRow
+      };
+      let privileges = await fetcher.fetch('/uica/component-states', 'PATCH',{
+        'Content-Type': 'application/json'
+      }, JSON.stringify(data));
+      this.$root.$emit("saved-uica", privileges);
+      // this.save(JSON.stringify(data, this.replacer, 2));
+    },
+    async handleEditComponentClick(event){
+      var formData = this.getJsonFromForm('editComponentForm');
+      console.log(formData);
+      const data = {
+        formId: this.formId,
+        componentId: this.componentId,
+        componentIdToRename: formData.name,
+        states: this.jsonRow
+      };
+      // this.componentId = formData.name;
+      // this.component = formData.name;
+      let privileges = await fetcher.fetch('/uica/component', 'PATCH',{
+        'Content-Type': 'application/json'
+      }, JSON.stringify(data));
+
+      this.privileges = privileges;
+      this.$root.$emit("saveduica", formData.name);
+      $('#popupModalComponent').modal('hide');
+      // this.$forceUpdate();
+    },
+    async handleDeleteComponentClick(event){
+      const formData = this.getJsonFromFormString(event.target)
+      let privileges = await fetcher.fetch('/uica/component', 'DELETE',{
+        'Content-Type': 'application/json'
+      }, formData);
+      this.$root.$emit("saved-uica", privileges);
+      $('#popupModalComponent').modal('hide');
+    },
+    getJsonFromForm(id){
+      var object = $('#'+id).serializeArray()
+          .reduce(function (json, { name, value }) {
+            json[name] = value;
+            return json;
+          }, {});
+      return object;
+    },
+    getJsonFromFormString(id){
+      var object = this.getJsonFromForm(id);
+      return JSON.stringify(object);
+    },
+
+    handleCreateGroupClick(event){
+        var selectedOption = $('#selectOption').val();
+        var rev = 0;
+        var group = {
+          state: selectedOption.toUpperCase(),
+          entity: null,
+          rev: rev,
+          privileges: []
+        };
+        console.log('jsonRow3', this.jsonRow);
+        var isExist = this.jsonRow.find(g => g.state === selectedOption.trim().toUpperCase());
+        if(isExist){
+          let findDuplicates = jsonPath(this.jsonRow, "$.[?(@.state=='"+selectedOption.toUpperCase()+"')]");
+          let size = findDuplicates.length-1
+          rev = size + 1;
+          group.rev = rev;
+        }
+      this.jsonRow.push(group);
+        console.log("@@@@@@@@@@@@2");
+        var groupElement = $('<div>').attr('state',selectedOption).attr('rev',rev);
+        var name = $('<div>').addClass('group-header').text(selectedOption.toUpperCase());
+        var groupElementMain = $('<div>').addClass('entity-group').attr('state',selectedOption).attr('rev',rev);
+        groupElementMain.append(name);
+        groupElementMain.append(groupElement);
+
+        var deleteButton = $('<button>').addClass('btn btn-danger btn-sm delete-button').attr('state',selectedOption).attr('rev',rev).text('Delete')
+            .click(e => {
+              groupElementMain.remove();
+              let find = jsonPath(this.jsonRow, "$.[?(@.state=='"+ selectedOption.toUpperCase()+"' && @.rev=="+ $(this).attr("rev")+")]")[0];
+              var groupIndex = this.jsonRow.findIndex(g => g === find);
+              if (groupIndex !== -1) {
+                this.jsonRow.splice(groupIndex, 1);
+              }
+              this.updateJsonRepresentation(this.jsonRow);
+            });
+        console.log("@@@@@@@@@@@@3");
+        $('#entity-groups').append(groupElementMain);
+        $(".entity-group[state="+selectedOption+"][rev="+rev+"]").append(deleteButton);
+      this.makeGroupDroppable(groupElementMain);
+      this.editor.setValue(JSON.stringify(this.jsonRow, this.replacer, 2), -1);
+      this.updateJsonRepresentation(this.jsonRow);
+        $('#popupModal').modal('hide'); // Close the popup
+      //
+      // });
+    },
+    handleFormIdClick(event,id){
+      this.json = jsonPath(this.privileges?.config?.componentAccess,"$[?(@.componentId == '"+id+"')].states[*]");
+      // this.jsonRow = new Object(this.json);
+      this.main();
+      $(".component-id").each( function(i,o){$(o).removeClass('active')});
+      
+      $(event.target).addClass("active");
+      // this.forceRerender()
+      console.log('json',JSON.stringify(this.json));
+    },
+    async fetchPrivilege(){
+      return await fetcher.fetch('/uica/get/'+ this.formId, 'GET',{
+        'Content-Type': 'application/json',
+      });
+    },
+    async save(data){
+      let privileges = await fetcher.fetch('/uica/save', 'POST',{
+        'Content-Type': 'application/json'
+      }, data);
+      this.$root.$emit("saved-uica", privileges);
+    },
+    updateJsonRepresentation(json) {
+      var jsonRepresentation = JSON.stringify(json, null, 2);
+      // jsonRow =  JSON.parse(editor.getValue());
+      $('#json-viewer').text(jsonRepresentation);
+      this.json = JSON.stringify(this.jsonRow, this.replacer, 2);
+
+    },
+    makeGroupDroppable(group) {
+      const app = this;
+      console.log('makeGroupDroppable', group);
+      $(group).droppable({
+        accept: '.item',
+        drop: function(event, ui) {
+
+          var dropped = ui.draggable;
+          console.log('makeGroupDroppableEvent', event);
+          var droppedOn = $(this);
+          var itemText = dropped.text().trim();
+          let find = jsonPath(app.jsonRow, "$.[?(@.state=='" + droppedOn.context.getAttribute('state').trim().toUpperCase()+"' && @.rev=="+droppedOn.context.getAttribute('rev')+")]")[0];
+          var groupIndex = app.jsonRow.findIndex(g => g === find);
+          //var groupIndex = groups.findIndex(g => g.entity === droppedOn.context.getAttribute('entity').trim().toUpperCase() && g.rev == droppedOn.context.getAttribute('rev'));
+
+          // Check for duplicates
+          if (groupIndex !== -1 && !app.jsonRow[groupIndex].privileges.includes(itemText)) {
+            //var item = dropped.clone().removeAttr('style').removeClass('ui-draggable ui-draggable-handle');
+            var newTag = document.createElement('span');
+            newTag.className = 'tag';
+            newTag.textContent = itemText;
+
+            var closeButton = document.createElement('span');
+            closeButton.className = 'close';
+            closeButton.innerHTML = '&times;'; // HTML entity for the multiplication sign (x)
+            closeButton.onclick = function(event) {
+              event.stopPropagation(); // Prevent the click event from bubbling up to the parent
+              droppedOn.context.removeChild(newTag);
+              let find = jsonPath(app.jsonRow, "$.[?(@.state=='" + droppedOn.context.getAttribute('state').trim().toUpperCase()+"' && @.rev=="+droppedOn.context.getAttribute('rev')+")]")[0];
+              var groupIndex = app.jsonRow.findIndex(g => g === find);
+              var index = app.jsonRow[groupIndex].privileges.indexOf(itemText);
+
+              if (index !== -1) {
+                app.jsonRow[groupIndex].privileges.splice(index, 1);
+                app.editor.setValue(JSON.stringify(app.jsonRow, app.replacer, 2), -1);
+                app.updateJsonRepresentation(app.jsonRow);
+              }
+
+            };
+
+            newTag.appendChild(closeButton);
+            droppedOn.append(newTag);
+            app.jsonRow[groupIndex].privileges.push(itemText);
+            app.editor.setValue(JSON.stringify(app.jsonRow, app.replacer, 2), -1);
+            app.updateJsonRepresentation(app.jsonRow);
+          }
+
+        }
+
+      });
+    },
+    createFromJson(json){
+      const app = this;
+      $('#entity-groups').empty();
+      // var groups = [];
+      console.log(json);
+      var revs = new Map();//contains next values of revisions
+      json.forEach(e => {
+        var rev = 0;
+        var state = e.state.toUpperCase();
+        var entity = e.entity?.toUpperCase();
+        var stateLower = e.state.toLowerCase();
+
+        rev = revs.get(state) != undefined ? revs.get(state) + 1 : rev;
+        revs.set(state, rev);
+        e.rev = rev;
+
+        var groupElement = $('<div>').attr('state',stateLower).attr('rev',rev);
+        var name = $('<div>').addClass('group-header').text(state);
+        var groupElementMain = $('<div>').addClass('entity-group').attr('state',stateLower).attr('rev',rev);
+        groupElementMain.append(name);
+        groupElementMain.append(groupElement);
+        if(entity !== null){
+          var enityLabelSpan = $('<span>').addClass('entity-label badge badge-secondary').text(entity);
+          groupElementMain.append(enityLabelSpan);
+        }
+        var deleteButton = $('<button>').addClass('btn btn-danger btn-sm delete-button').attr('state',stateLower).attr('rev',rev).text('Delete').click(function() {
+          groupElementMain.remove();
+          let find = jsonPath(app.jsonRow, "$.[?(@.state=='"+ state +"' && @.rev=="+$(this).attr("rev")+")]")[0];
+          var groupIndex = app.jsonRow.findIndex(g => g === find);
+          if (groupIndex !== -1) {
+            app.jsonRow.splice(groupIndex, 1);
+          }
+          app.editor.setValue(JSON.stringify(app.jsonRow, app.replacer, 2), -1);
+          app.updateJsonRepresentation(app.jsonRow);
+
+        });
+        $('#entity-groups').append(groupElementMain);
+        $(".entity-group[state="+stateLower+"][rev="+rev+"]").append(deleteButton);
+        app.makeGroupDroppable(groupElementMain);
+        app.updateJsonRepresentation(app.jsonRow);
+        app.json = JSON.stringify(app.jsonRow, app.replacer, 2);
+        app.createItemsFromJson(groupElement, e.privileges)
+      })
+    },
+    updateJsonRepresentation(json) {
+      const replacer = (key, value) => {
+        if(key == "rev"){ return undefined;}else return value;
+      }
+      var jsonRepresentation = JSON.stringify(json, null, 2);
+      // jsonRow =  JSON.parse(editor.getValue());
+      $('#json-viewer').text(jsonRepresentation);
+      this.json = JSON.stringify(this.jsonRow, this.replacer, 2);
+
+    },
+    createItemsFromJson(groupElement, items) {
+      const app = this;
+      items.forEach( item => {
+        var droppedOn = groupElement;
+        var itemText = item;
+        let find = jsonPath(app.jsonRow, "$.[?(@.state=='" + droppedOn.attr('state').toUpperCase()+"' && @.rev==" + droppedOn.attr('rev')+")]")[0];
+        var groupIndex = app.jsonRow.findIndex(g => g === find);
+        // Check for duplicates
+        if (groupIndex !== -1) {
+          var newTag = document.createElement('span');
+          newTag.className = 'tag';
+          newTag.textContent = itemText;
+
+          var closeButton = document.createElement('span');
+          closeButton.className = 'close';
+          closeButton.innerHTML = '&times;'; // HTML entity for the multiplication sign (x)
+          closeButton.onclick = function(event) {
+            event.stopPropagation(); // Prevent the click event from bubbling up to the parent
+            $(newTag).remove();
+            let find = jsonPath(app.jsonRow, "$.[?(@.state=='" + droppedOn.attr('state').toUpperCase()+"' && @.rev=="+droppedOn.attr('rev')+")]")[0];
+            var groupIndex = app.jsonRow.findIndex(g => g === find);
+            var index = app.jsonRow[groupIndex].privileges.indexOf(itemText);
+
+            if (index !== -1) {
+              app.jsonRow[groupIndex].privileges.splice(index, 1);
+              app.updateJsonRepresentation(app.jsonRow);
+              app.editor.setValue(JSON.stringify(app.jsonRow, app.replacer, 2), -1);
+            }
+          };
+
+          newTag.appendChild(closeButton);
+          droppedOn.append(newTag);
+          app.updateJsonRepresentation(app.jsonRow);
+        }
+
+      })
+
+    }
+  },
+  components:{
+
+  }
+};
+</script>
+
+<style>
+#myTab {
+  margin-bottom: 15px;
+}
+.component-header {
+  margin-bottom: 10px;
+  font-size: 16pt;
+  font-weight: 600;
+}
+.col-main {
+  border-right: 1px solid #ccc;
+}
+.entity-group {
+  min-height: 50px;
+  //border: 1px solid #ddd;
+  border: 2px solid #2c6bff5e;
+  margin-bottom: 15px;
+  background-color: #2c6bff14;
+  padding: 10px;
+  position: relative;
+ // box-shadow: 2px 3px 10px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  margin: 10px;
+  overflow: hidden;
+}
+.item {
+  display: inline-block;
+  padding: 5px 10px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 8pt;
+  font-weight: 600;
+}
+.item.ui-draggable-dragging {
+  background-color: #dee2e6;
+}
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 12px;
+  padding: 2px 5px;
+}
+#json-viewer {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  height: 100vh;
+  overflow: scroll;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+.tag {
+  display: inline-block;
+  //padding: 5px 10px;
+  //margin: 5px;
+  //background-color: #dfdfdf;
+  //border: 1px solid #ddd;
+  //border-radius: 15px;
+  font-size: 8pt;
+  font-weight: 600;
+}
+.close {
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 10pt;
+}
+.ll {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+#create-group {
+  //height: 50px;
+  margin: 5px;
+}
+.ui-droppable-hover{
+  background: #eaf5ff;
+}
+.ui-droppable{
+  min-height: 50px;
+}
+.group-header{
+  font-weight: 600;
+}
+.container-xxl .row:first-child {
+  margin: 0;
+}
+.container-xxl {
+  flex-direction: column;
+}
+
+
+textarea {
+  width: 100%;
+  height: 200px;
+  font-family: 'Courier New', Courier, monospace;
+}
+.error {
+  background-color: #ffcccc;
+  border: 1px solid #ff0000;
+}
+
+#editor {
+  width: 100%;
+  height: inherit;
+}
+#entity-groups {
+  overflow-y: scroll;
+  max-height: 60vh;
+  padding-right: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 2px solid #2c6bff5e;
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+#bottom-bar {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  background-color: #343a40;
+  color: #fff;
+  //padding: 10px 20px;
+  z-index: 9999;
+  transition: transform 0.3s ease-in-out;
+  transform: translateY(100%);
+  height: 100vh;
+  width: 35vw;
+}
+#bottom-bar.show {
+  transform: translateY(0);
+}
+
+#toggle-bottom-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  margin: 20px;
+  z-index: 999;
+}
+
+#close-bottom-bar{
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+
+.active{
+  color: #2c6bff;
+}
+
+.nav-tabs .nav-item {
+  font-size: 8pt;
+}
+.groups-min{
+  max-width: 50vw;
+}
+#groups-column {
+  transition: 0.4s ease-out;
+  border-right: none !important;
+}
+.tab-pane{
+  padding:5px;
+}
+
+div[state] {
+  display: flex;
+  flex-direction: column;
+}
+.entity-label {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  font-size: 9px;
+}
+#selectOption {
+  max-width: 200px;
+  cursor: pointer;
+}
+</style>

@@ -1,0 +1,51 @@
+
+/*.main {*/
+/*    display: flex;*/
+/*}*/
+.content-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.container-xxl {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+}
+.table-container {
+    border: 2px solid #e8e8e8;
+}
+
+.align-center{
+    display: flex;
+    align-items: center;
+}
+
+.action-cell {
+    display: flex;
+    justify-content: space-around;
+    width: 150px;
+}
+.id-cell {
+    font-weight: 650;
+}
+.description-cell {
+    /*font-style: italic;*/
+}
+.priority-cell {
+    font-weight: 650;
+}
+
+.new-button {
+    margin: 1rem 0 0 1rem;
+}
+.background-light{
+    background: #efefef;
+    padding: 5px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
