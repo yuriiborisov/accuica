@@ -1,9 +1,4 @@
-package code.uica.impl.dto;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-import code.uica.code.Config4UICA;
-import code.uica.code.Holder4UICA;
+package code.uica.code.dto;
 
 //@Data
 //public class UICAHolderDto implements Holder4UICA {

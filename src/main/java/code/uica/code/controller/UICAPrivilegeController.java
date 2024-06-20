@@ -1,16 +1,11 @@
 package code.uica.code.controller;
 
 import code.common.PrivilegeApplicable;
-import code.uica.code.Holder4UICA;
 import code.uica.code.Privilege4UICA;
 import code.uica.code.UICAService;
 import code.uica.code.UICAServiceConfiguration;
-import code.uica.code.service.HolderService4UICA;
 import code.uica.code.service.PrivilegeService4UICA;
-import code.uica.impl.dto.EntityUICAResponse;
-import code.uica.impl.dto.UICARequest;
 import io.swagger.v3.oas.annotations.Operation;
-import javax.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static code.accessor.core.config.Consts.APP;
 

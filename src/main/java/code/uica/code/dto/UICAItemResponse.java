@@ -1,4 +1,4 @@
-package code.uica.impl.dto;
+package code.uica.code.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

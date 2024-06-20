@@ -2,8 +2,8 @@ package code.accessor.core.code.service;
 
 import code.accessor.core.code.dto.PrivilegeEntityMatrix;
 import code.accessor.core.code.dto.response.Role4AccessResponse;
-import code.impl.accessor.dto.request.Role4AccessRequest;
-import code.impl.accessor.dto.request.Role4AccessRequestV2;
+import code.accessor.core.dto.Role4AccessRequest;
+import code.accessor.core.dto.Role4AccessRequestV2;
 
 import java.util.List;
 

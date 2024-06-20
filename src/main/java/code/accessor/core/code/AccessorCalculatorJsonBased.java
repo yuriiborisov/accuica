@@ -1,7 +1,7 @@
 //package code.accessor.core.code;
 //
 //
-//import code.accessor.core.code.dto.User4Access;
+//import code.accessor.core.code.accessor.core.dto.User4Access;
 //import code.accessor.core.code.exception.AccessDeniedException;
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.security.core.Authentication;

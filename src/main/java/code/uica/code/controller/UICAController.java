@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import code.uica.code.UICAService;
-import code.uica.impl.dto.EntityUICAResponse;
-import code.uica.impl.dto.UICARequest;
+import code.uica.code.dto.EntityUICAResponse;
+import code.uica.code.dto.UICARequest;
 
 import java.util.List;
 import java.util.Map;

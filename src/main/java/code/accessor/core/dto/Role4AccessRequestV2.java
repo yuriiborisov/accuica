@@ -1,7 +1,10 @@
-package code.impl.accessor.dto.request;
+package code.accessor.core.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;

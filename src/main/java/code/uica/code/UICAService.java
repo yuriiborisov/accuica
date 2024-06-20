@@ -1,14 +1,13 @@
 package code.uica.code;
 
-import code.uica.impl.dto.UICARequest;
-import code.uica.impl.dto.EntityUICAResponse;
-import code.uica.impl.dto.UICAItemResponse;
+import code.uica.code.dto.UICARequest;
+import code.uica.code.dto.EntityUICAResponse;
+import code.uica.code.dto.UICAItemResponse;
 import code.uica.code.exception.UICAException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;

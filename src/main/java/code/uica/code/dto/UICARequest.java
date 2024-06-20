@@ -1,4 +1,4 @@
-package code.uica.impl.dto;
+package code.uica.code.dto;
 
 import lombok.Data;
 
